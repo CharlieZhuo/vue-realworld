@@ -6,17 +6,20 @@ type User = components["schemas"]["User"];
 
 const userStore = new BrowserKVStore<User>("user");
 
-export interface UserManager {
+// 用于判断用户是否已经登录
+// 此函数只为组件树之外使用，组件树内请inject UserKey
+export function IsLoggedIn(): boolean {
+  return userStore.get() !== null;
+}
+
+export interface ProvidedUserInterface {
   CurrentUser: User | null;
   Login: (user: User) => void;
   Logout: () => void;
 }
 
-export function IsLoggedIn(): boolean {
-  return userStore.get() !== null;
-}
-
-export const UserKey: InjectionKey<UserManager> = Symbol("UserManager");
+export const UserKey: InjectionKey<ProvidedUserInterface> =
+  Symbol("UserManager");
 
 export const userPlugin: Plugin = {
   install(app) {
