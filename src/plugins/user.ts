@@ -4,7 +4,8 @@ import { InjectionKey, Plugin, ref } from "vue";
 
 type User = components["schemas"]["User"];
 
-const userStore = new BrowserKVStore<User>("user");
+// 只为组件树之外使用，组件树内请inject UserKey
+export const userStore = new BrowserKVStore<User>("user");
 
 // 用于判断用户是否已经登录
 // 此函数只为组件树之外使用，组件树内请inject UserKey
