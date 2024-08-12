@@ -8,18 +8,19 @@ if (!baseUrl) {
   throw new Error("VITE_API_BASE_URL is not set");
 }
 
-let client: Client<paths> = createClient({ baseUrl });
+let ApiClient: Client<paths> = createClient({ baseUrl });
 
 export function getApiClient() {
-    return readonly(client);
+  return readonly(ApiClient);
 }
 
-export function updateClientToken(authToken: string) {
-  client = createClient({
+// 更新API客户端的令牌
+// 当用户登录或注销时，我们需要更新API客户端的令牌
+export function updateClientToken(authToken?: string) {
+  ApiClient = createClient({
     baseUrl,
-    headers: {
-      Authorization: `Bearer ${authToken}`,
-    },
+    // add authorization header if authToken is provided
+    headers: authToken ? { Authorization: `Bearer ${authToken}` } : undefined,
   });
-  return client;
+  return ApiClient;
 }
