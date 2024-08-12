@@ -1,26 +1,72 @@
 <template>
   <nav class="navbar navbar-light">
     <div class="container">
-      <a class="navbar-brand" href="index.html">conduit</a>
+      <RouterLink :to="{ name: 'home' }" class="navbar-brand"
+        >conduit</RouterLink
+      >
       <ul class="nav navbar-nav pull-xs-right">
-        <li class="nav-item">
-          <!-- Add "active" class when you're on that page" -->
-          <a class="nav-link active" href="">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="">
-            <i class="ion-compose"></i>&nbsp;New Post
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="">
-            <i class="ion-gear-a"></i>&nbsp;Settings
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="">Sign up</a>
+        <li class="nav-item" v-for="item in displayedNavItems" :key="item.name">
+          <RouterLink
+            :to="{ name: item.toRoute, params: item.params }"
+            active-class="active"
+            class="nav-link"
+          >
+            {{ item.name }}
+          </RouterLink>
         </li>
       </ul>
     </div>
   </nav>
 </template>
+<script setup lang="ts">
+import { RouteParams, RouterLink } from "vue-router";
+import { AppRouteNames } from "../router";
+import { UserKey } from "../plugins/user";
+import { computed, inject } from "vue";
+
+const userInject = inject(UserKey)!;
+const username=computed(()=>userInject?.CurrentUser?.username)
+
+const authenticated = computed(() =>
+  username.value ? "authenticated" : "unauthenticated"
+);
+
+interface navItem {
+  name: string;
+  toRoute: AppRouteNames;
+  params?: Partial<RouteParams>;
+  authorization: "always" | "authenticated" | "unauthenticated";
+}
+const navItems: navItem[] = [
+  { name: "Home", toRoute: "home", authorization: "always" },
+  {
+    name: "New Post",
+    toRoute: "create-article",
+    authorization: "authenticated",
+  },
+  { name: "Settings", toRoute: "settings", authorization: "authenticated" },
+  { name: "Sign up", toRoute: "register", authorization: "unauthenticated" },
+  { name: "Sign in", toRoute: "login", authorization: "unauthenticated" },
+];
+
+const userItem = computed(() => {
+  if (authenticated.value === "authenticated")
+    return {
+      name: username.value ,
+      toRoute: "profile",
+      params: { username: username.value },
+      authorization: "authenticated",
+    };
+  else return null
+});
+
+const displayedNavItems = computed(() => {
+  userItem??navItems.push(userItem);
+  return navItems.filter((item) => {
+    return (
+      item.authorization === "always" ||
+      item.authorization === authenticated.value
+    );
+  });
+});
+</script>
