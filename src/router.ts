@@ -1,7 +1,6 @@
 import { createWebHashHistory, createRouter, RouteRecordRaw } from "vue-router";
 import Home from "./pages/Home.vue";
 import Article from "./pages/Article.vue";
-
 const routes: RouteRecordRaw[] = [
   { path: "/", component: Home, name: "home" },
   { path: "/article/:id", component: Article, name: "article" },
@@ -11,22 +10,46 @@ const routes: RouteRecordRaw[] = [
     name: "login",
   },
   {
-  path: "/register",
-  component: () => import("./pages/Register.vue"),
-  name: "register",
+    path: "/register",
+    component: () => import("./pages/Register.vue"),
+    name: "register",
   },
   {
-    path:"/profile/:username",
-    alias:"/profile/:username/favorites",
+    path: "/profile/:username",
+    alias: "/profile/:username/favorites",
     component: () => import("./pages/Profile.vue"),
-    name: "profile"
+    name: "profile",
   },
   {
-    path:"/settings",
+    path: "/settings",
     component: () => import("./pages/Setting.vue"),
-    name: "settings"
-  }
+    name: "settings",
+  },
+  {
+    path: "/editor",
+    component: () => import("./pages/Editor.vue"),
+    name: "create-article",
+  },
+  {
+    path: "/editor/:articleId",
+    component: () => import("./pages/Editor.vue"),
+    name: "edit-article",
+  },
 ];
+export type AppRouteNames =
+| 'home'
+| 'article'
+| 'login'
+| 'register'
+| 'profile'
+| 'settings'
+| 'create-article'
+| 'edit-article'
+| 'profile-favorites'
+
+export function routerPushTyped(route: AppRouteNames): void {
+  router.push({ name: route });
+}
 
 export const router = createRouter({
   history: createWebHashHistory(),
