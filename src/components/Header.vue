@@ -25,10 +25,9 @@ import { UserKey } from "../plugins/user";
 import { computed, inject } from "vue";
 
 const userInject = inject(UserKey)!;
-const username=computed(()=>userInject?.CurrentUser?.username)
 
 const authenticated = computed(() =>
-  username.value ? "authenticated" : "unauthenticated"
+  userInject.CurrentUser ? "authenticated" : "unauthenticated"
 );
 
 interface navItem {
@@ -37,32 +36,29 @@ interface navItem {
   params?: Partial<RouteParams>;
   authorization: "always" | "authenticated" | "unauthenticated";
 }
-const navItems: navItem[] = [
-  { name: "Home", toRoute: "home", authorization: "always" },
-  {
-    name: "New Post",
-    toRoute: "create-article",
-    authorization: "authenticated",
-  },
-  { name: "Settings", toRoute: "settings", authorization: "authenticated" },
-  { name: "Sign up", toRoute: "register", authorization: "unauthenticated" },
-  { name: "Sign in", toRoute: "login", authorization: "unauthenticated" },
-];
 
-const userItem = computed(() => {
-  if (authenticated.value === "authenticated")
-    return {
-      name: username.value ,
-      toRoute: "profile",
-      params: { username: username.value },
+const navItems = computed(() => {
+  return [
+    { name: "Home", toRoute: "home", authorization: "always" },
+    {
+      name: "New Post",
+      toRoute: "create-article",
       authorization: "authenticated",
-    };
-  else return null
+    },
+    { name: "Settings", toRoute: "settings", authorization: "authenticated" },
+    { name: "Sign up", toRoute: "register", authorization: "unauthenticated" },
+    { name: "Sign in", toRoute: "login", authorization: "unauthenticated" },
+    {
+      name: userInject?.CurrentUser?.username ?? "",
+      toRoute: "profile",
+      params: { username: userInject?.CurrentUser?.username ?? "" },
+      authorization: "authenticated",
+    },
+  ] as navItem[];
 });
 
 const displayedNavItems = computed(() => {
-  userItem??navItems.push(userItem);
-  return navItems.filter((item) => {
+  return navItems.value.filter((item) => {
     return (
       item.authorization === "always" ||
       item.authorization === authenticated.value
