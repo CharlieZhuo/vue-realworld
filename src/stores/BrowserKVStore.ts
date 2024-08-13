@@ -1,6 +1,7 @@
 type StorageType = 'localStorage' | 'sessionStorage'
+import { Store } from "./Store"
 
-export default class BrowserKVStore<T = unknown> {
+export default class BrowserKVStore<T = unknown> implements Store<T> {
   private readonly key: string
   private readonly storageType: StorageType
 

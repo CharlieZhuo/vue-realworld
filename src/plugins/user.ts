@@ -5,12 +5,12 @@ import { InjectionKey, Plugin, ref } from "vue";
 type User = components["schemas"]["User"];
 
 // 只为组件树之外使用，组件树内请inject UserKey
-export const userStore = new BrowserKVStore<User>("user");
+export const browserUserStore = new BrowserKVStore<User>("user");
 
 // 用于判断用户是否已经登录
 // 此函数只为组件树之外使用，组件树内请inject UserKey
 export function IsLoggedIn(): boolean {
-  return userStore.get() !== null;
+  return browserUserStore.get() !== null;
 }
 
 export interface ProvidedUserInterface {
@@ -22,19 +22,23 @@ export interface ProvidedUserInterface {
 export const UserKey: InjectionKey<ProvidedUserInterface> =
   Symbol("UserManager");
 
-export const userPlugin: Plugin = {
-  install(app) {
-    const userRef = ref(userStore.get());
-    app.provide(UserKey, {
-      CurrentUser: userRef.value,
-      Login: (user: User) => {
-        userStore.set(user);
-        userRef.value = user;
-      },
-      Logout: () => {
-        userStore.remove();
-        userRef.value = null;
-      },
-    });
-  },
-};
+import { Store } from "../stores/Store";
+
+export function createUserPlugin(userStore:Store<User>):Plugin {
+  return {
+    install(app) {
+      const userRef = ref(userStore.get());
+      app.provide(UserKey, {
+        CurrentUser: userRef.value,
+        Login: (user: User) => {
+          userStore.set(user);
+          userRef.value = user;
+        },
+        Logout: () => {
+          userStore.remove();
+          userRef.value = null;
+        },
+      });
+    },
+  };
+}

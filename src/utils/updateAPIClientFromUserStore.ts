@@ -1,7 +1,7 @@
 import { updateClientToken } from "../api/apiClient";
-import { userStore } from "../plugins/user";
+import { browserUserStore } from "../plugins/user";
 
 export function updateAPIClientFromUserStore() {
-  const user = userStore.get();
+  const user = browserUserStore.get();
   if (user) updateClientToken(user.token);
 }

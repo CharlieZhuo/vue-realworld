@@ -1,7 +1,7 @@
 import { createWebHashHistory, createRouter, RouteRecordRaw } from "vue-router";
 import Home from "./pages/Home.vue";
 import Article from "./pages/Article.vue";
-const routes: RouteRecordRaw[] = [
+export const routes: RouteRecordRaw[] = [
   { path: "/", component: Home, name: "home" },
   { path: "/article/:id", component: Article, name: "article" },
   {
