@@ -1,17 +1,7 @@
-import type { components } from "../api/schema";
-import BrowserKVStore from "../stores/BrowserKVStore";
 import { InjectionKey, Plugin, ref } from "vue";
 
+import type { components } from "../api/schema";
 type User = components["schemas"]["User"];
-
-// 只为组件树之外使用，组件树内请inject UserKey
-export const browserUserStore = new BrowserKVStore<User>("user");
-
-// 用于判断用户是否已经登录
-// 此函数只为组件树之外使用，组件树内请inject UserKey
-export function IsLoggedIn(): boolean {
-  return browserUserStore.get() !== null;
-}
 
 export interface ProvidedUserInterface {
   CurrentUser: User | null;
@@ -24,7 +14,26 @@ export const UserKey: InjectionKey<ProvidedUserInterface> =
 
 import { Store } from "../stores/Store";
 
-export function createUserPlugin(userStore:Store<User>):Plugin {
+export class UserManager {
+  private userStore: Store<User>;
+  constructor(userStore: Store<User>) {
+    this.userStore = userStore;
+  }
+  // 用于判断用户是否已经登录
+  // 此函数只为组件树之外使用，组件树内请用plugin中inject的对象
+  public IsLoggedIn(): boolean {
+    return this.userStore.get() !== null;
+  }
+  public get CurrentUser() {
+    return this.userStore.get();
+  }
+
+  public get UserPlugin(): Plugin {
+    return createUserPlugin(this.userStore);
+  }
+}
+
+export function createUserPlugin(userStore: Store<User>): Plugin {
   return {
     install(app) {
       const userRef = ref(userStore.get());

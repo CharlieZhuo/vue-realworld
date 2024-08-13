@@ -1,7 +1,7 @@
 import { updateClientToken } from "../api/apiClient";
-import { browserUserStore } from "../plugins/user";
+import { userManager } from "../main";
 
 export function updateAPIClientFromUserStore() {
-  const user = browserUserStore.get();
+  const user = userManager.CurrentUser;
   if (user) updateClientToken(user.token);
 }

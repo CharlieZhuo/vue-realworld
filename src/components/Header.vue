@@ -49,9 +49,9 @@ const navItems = computed(() => {
     { name: "Sign up", toRoute: "register", authorization: "unauthenticated" },
     { name: "Sign in", toRoute: "login", authorization: "unauthenticated" },
     {
-      name: userInject?.CurrentUser?.username ?? "",
+      name: userInject?.CurrentUser?.username ?? "placeholder",
       toRoute: "profile",
-      params: { username: userInject?.CurrentUser?.username ?? "" },
+      params: { username: userInject?.CurrentUser?.username ?? "placeholder" },
       authorization: "authenticated",
     },
   ] as navItem[];
