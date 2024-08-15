@@ -7,12 +7,9 @@ import {
   testPassword,
   testUser,
   mockUserManager,
-  mockUserStore
+  mockUserStore,
 } from "../utils/testMockObjects";
 import { testRouter } from "../utils/testUtils";
-
-
-
 
 describe("Login.vue", () => {
   it("should render login form", () => {
@@ -36,21 +33,19 @@ describe("Login.vue", () => {
     });
     const baseUrl = import.meta.env.VITE_API_BASE_URL as string | undefined;
     const server = setupServer(
-      http.post(
-        `${baseUrl}/users/login`,
-        async ({ request }) => {
-          console.log(request.body);
-          return HttpResponse.json(testUser);
-        }
-      )
+      http.post(`${baseUrl}/users/login`, async ({ request }) => {
+        console.log(request.body);
+        return HttpResponse.json(testUser);
+      })
     );
-    server.listen({onUnhandledRequest: "error"});
+    server.listen({ onUnhandledRequest: "error" });
 
     await wrapper.find('input[type="email"]').setValue(testUser.email);
     await wrapper.find('input[type="password"]').setValue(testPassword);
-    await wrapper.find('form').trigger("submit");
+    await wrapper.find("form").trigger("submit");
     await flushPromises();
-    expect(testRouter.currentRoute.value.path).toBe("/");
+    await flushPromises();
+    expect(wrapper.find(".error-messages li").text()).toBe("success");
     expect(mockUserStore.get()).toBe(testUser);
 
     server.close();

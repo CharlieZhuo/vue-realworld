@@ -12,7 +12,7 @@
             <li v-for="error in errorMessages" :key="error">{{ error }}</li>
           </ul>
 
-          <form ref="formRef" @submit.prevent="onSubmit">
+          <form ref="formRef" @submit="onSubmit">
             <fieldset class="form-group">
               <input
                 class="form-control form-control-lg"
@@ -44,7 +44,7 @@
 import { inject, ref } from "vue";
 import { components } from "../api/schema";
 type LoginType = components["schemas"]["LoginUser"];
-import { getApiClient } from "../api/apiClient";
+import { ApiClient } from "../api/apiClient";
 import { UserKey } from "../plugins/UserManager";
 import { useRouter } from "vue-router";
 import { AppRouteNames } from "../router";
@@ -58,21 +58,22 @@ const formState = ref<LoginType>({
 const formRef = ref<HTMLFormElement | null>(null);
 const errorMessages = ref<string[]>([]);
 
-function onSubmit() {
-  errorMessages.value = [];
-  getApiClient()
-    .POST("/users/login", { body: { user: formState.value } })
+function onSubmit(e: Event) {
+  e.preventDefault();
+  errorMessages.value.push("submitting");
+  ApiClient.POST("/users/login", { body: { user: formState.value } })
     .then((rawResponse) => {
       if (rawResponse.response.status !== 200 || !rawResponse.data) {
         errorMessages.value.push(rawResponse.response.statusText);
       } else {
+        console.log(rawResponse.data);
         const user = rawResponse.data.user;
         router.push({ name: "home" as AppRouteNames });
         if (userInject) userInject.UpdateCurrentUser(user);
       }
     })
     .catch((error) => {
-      errorMessages.value.push(error.message);
+      errorMessages.value = error.message;
       console.error(error);
     });
 }
