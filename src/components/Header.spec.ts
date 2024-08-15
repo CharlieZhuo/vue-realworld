@@ -4,7 +4,7 @@ import { mount } from "@vue/test-utils";
 
 import { testRouter } from "../utils/testUtils";
 import { mockStore, testUser } from "../utils/testMockObjects";
-import { createUserPlugin } from "../plugins/user";
+import { createUserPlugin } from "../plugins/UserManager";
 
 describe("Header.vue", () => {
   it("should render link to homepage", () => {
@@ -35,7 +35,7 @@ describe("Header.vue", () => {
     });
 
     const links = wrapper.findAll("ul li a");
-    // expect(links.length).toBe(4);
+    expect(links.length).toBe(4);
     expect(links[0].text()).toBe("Home");
     expect(links[1].text()).toBe("New Post");
     expect(links[2].text()).toBe("Settings");

@@ -21,7 +21,7 @@
 <script setup lang="ts">
 import { RouteParams, RouterLink } from "vue-router";
 import { AppRouteNames } from "../router";
-import { UserKey } from "../plugins/user";
+import { UserKey } from "../plugins/UserManager";
 import { computed, inject } from "vue";
 
 const userInject = inject(UserKey)!;

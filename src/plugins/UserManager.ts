@@ -5,8 +5,8 @@ type User = components["schemas"]["User"];
 
 export interface ProvidedUserInterface {
   CurrentUser: User | null;
-  Login: (user: User) => void;
-  Logout: () => void;
+  UpdateCurrentUser: (user: User) => void;
+  RemoveCurrentUser: () => void;
 }
 
 export const UserKey: InjectionKey<ProvidedUserInterface> =
@@ -39,11 +39,11 @@ export function createUserPlugin(userStore: Store<User>): Plugin {
       const userRef = ref(userStore.get());
       app.provide(UserKey, {
         CurrentUser: userRef.value,
-        Login: (user: User) => {
+        UpdateCurrentUser: (user: User) => {
           userStore.set(user);
           userRef.value = user;
         },
-        Logout: () => {
+        RemoveCurrentUser: () => {
           userStore.remove();
           userRef.value = null;
         },
