@@ -1,6 +1,7 @@
 import { createWebHashHistory, createRouter, RouteRecordRaw } from "vue-router";
 import Home from "./pages/Home.vue";
 import Article from "./pages/Article.vue";
+import { BrowserUserManager } from "./plugins/BrowserUserManager";
 export const routes: RouteRecordRaw[] = [
   { path: "/", component: Home, name: "home" },
   { path: "/article/:id", component: Article, name: "article" },
@@ -8,11 +9,13 @@ export const routes: RouteRecordRaw[] = [
     path: "/login",
     component: () => import("./pages/Login.vue"),
     name: "login",
+    beforeEnter: () => !BrowserUserManager.IsLoggedIn(),
   },
   {
     path: "/register",
     component: () => import("./pages/Register.vue"),
     name: "register",
+    beforeEnter: () => !BrowserUserManager.IsLoggedIn(),
   },
   {
     path: "/profile/:username",
@@ -37,15 +40,15 @@ export const routes: RouteRecordRaw[] = [
   },
 ];
 export type AppRouteNames =
-| 'home'
-| 'article'
-| 'login'
-| 'register'
-| 'profile'
-| 'settings'
-| 'create-article'
-| 'edit-article'
-| 'profile-favorites'
+  | "home"
+  | "article"
+  | "login"
+  | "register"
+  | "profile"
+  | "settings"
+  | "create-article"
+  | "edit-article"
+  | "profile-favorites";
 
 export function routerPushTyped(route: AppRouteNames): void {
   router.push({ name: route });
