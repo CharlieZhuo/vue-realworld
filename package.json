@@ -15,13 +15,14 @@
     "vue-router": "^4.4.3"
   },
   "devDependencies": {
-    "vitest": "^2.0.5",
     "@vitejs/plugin-vue": "^5.1.2",
     "@vue/test-utils": "^2.4.6",
     "jsdom": "^24.1.1",
+    "msw": "^2.3.5",
     "openapi-typescript": "^7.3.0",
     "typescript": "^5.5.3",
     "vite": "^5.4.0",
+    "vitest": "^2.0.5",
     "vue-tsc": "^2.0.29"
   }
 }
