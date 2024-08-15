@@ -1,4 +1,5 @@
 import type { components } from "../api/schema";
+import { UserManager } from "../plugins/UserManager";
 type User = components["schemas"]["User"];
 
 export const testUser: User = {
@@ -9,14 +10,12 @@ export const testUser: User = {
   token: "testtoken",
 };
 
+export const testPassword = "password";
+
 import { Store } from "../stores/Store";
 
-export class mockStore<T> implements Store<T> {
+export class MockStore<T> implements Store<T> {
   private value: T | null = null;
-
-  constructor(initialValue: T | null = null) {
-    this.value = initialValue;
-  }
 
   get() {
     return this.value;
@@ -29,3 +28,5 @@ export class mockStore<T> implements Store<T> {
   }
 }
 
+export const mockUserStore = new MockStore<User>();
+export const mockUserManager=new UserManager(mockUserStore);

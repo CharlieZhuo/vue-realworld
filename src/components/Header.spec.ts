@@ -1,16 +1,23 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import Header from "./Header.vue";
 import { mount } from "@vue/test-utils";
 
 import { testRouter } from "../utils/testUtils";
-import { mockStore, testUser } from "../utils/testMockObjects";
-import { createUserPlugin } from "../plugins/UserManager";
+import {
+  mockUserManager,
+  mockUserStore,
+  testUser,
+} from "../utils/testMockObjects";
+
+beforeEach(() => {
+  mockUserStore.remove();
+});
 
 describe("Header.vue", () => {
   it("should render link to homepage", () => {
     const wrapper = mount(Header, {
       global: {
-        plugins: [testRouter, createUserPlugin(new mockStore(testUser))],
+        plugins: [testRouter, mockUserManager.UserPlugin],
       },
     });
     expect(wrapper.findComponent("a").text()).toBe("conduit");
@@ -18,7 +25,7 @@ describe("Header.vue", () => {
   it("should render link to home, sign up, sign in when not authenticated", () => {
     const wrapper = mount(Header, {
       global: {
-        plugins: [testRouter, createUserPlugin(new mockStore())],
+        plugins: [testRouter, mockUserManager.UserPlugin],
       },
     });
     const links = wrapper.findAll("ul li a");
@@ -28,9 +35,10 @@ describe("Header.vue", () => {
     expect(links[2].text()).toBe("Sign in");
   });
   it("should render link to home, new post, settings and profile when authenticated", () => {
+    mockUserStore.set(testUser);
     const wrapper = mount(Header, {
       global: {
-        plugins: [testRouter, createUserPlugin(new mockStore(testUser))],
+        plugins: [testRouter, mockUserManager.UserPlugin],
       },
     });
 
