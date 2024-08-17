@@ -56,12 +56,18 @@ export function useArticles(props: useArticlesProps) {
       });
     }
   }
-  const { startProcess, isProcessing } = useAsync({
-    process: fetchArticles,
+  const { startProcess, isProcessing } = useAsync(fetchArticles);
+
+  watch(feedMode, () => {
+    if (currentPage.value == 1) {
+      startProcess();
+    } else {
+      currentPage.value = 1;
+    }
   });
 
   watch(
-    [currentPage, feedMode],
+    [currentPage],
     () => {
       startProcess();
     },

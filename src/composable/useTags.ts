@@ -11,9 +11,7 @@ export function useTags() {
       }
     });
   };
-  const { startProcess, isProcessing } = useAsync({
-    process: fetchTags,
-  });
+  const { startProcess, isProcessing } = useAsync(fetchTags);
   startProcess();
   return {
     tags,

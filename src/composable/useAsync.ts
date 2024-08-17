@@ -1,20 +1,20 @@
-import { ref } from "vue";
+import { Ref, ref } from "vue";
 
-interface useAsyncInput<T> {
-  process: (...args: unknown[]) => T;
-}
 interface useAsyncOutput<T> {
   startProcess: () => Promise<T>;
-  isProcessing: boolean;
+  isProcessing: Ref<boolean>;
 }
 
-export function useAsync<T>(prop: useAsyncInput<T>): useAsyncOutput<T> {
+export function useAsync<T>(
+  prop: (...args: unknown[]) => T
+): useAsyncOutput<T> {
   const isProcessingState = ref(false);
 
   async function startProcess(...args: unknown[]): Promise<T> {
     isProcessingState.value = true;
     try {
-      const result = await prop.process(...args);
+      const result = await prop(...args);
+      isProcessingState.value = false;
       return result;
     } finally {
       isProcessingState.value = false;
@@ -23,6 +23,6 @@ export function useAsync<T>(prop: useAsyncInput<T>): useAsyncOutput<T> {
 
   return {
     startProcess,
-    isProcessing: isProcessingState.value,
+    isProcessing: isProcessingState,
   };
 }

@@ -13,10 +13,14 @@
           <FeedToggle :feedMode="props.feedMode" />
 
           <ArticlePreview
+            v-if="!isProcessing"
             v-for="article in articles"
             :key="article.slug"
             :article="article"
           />
+          <div class="article-preview" v-if="isProcessing">
+            Loading articles
+          </div>
 
           <Pagination
             :total="totalArticles"
@@ -48,10 +52,16 @@ import { useTags } from "../composable/useTags";
 import TagList from "../components/TagList.vue";
 import { watch } from "vue";
 
-const { articles, totalArticles, changePage, currentPage, changeFeedMode } =
-  useArticles({
-    feedMode: props.feedMode,
-  });
+const {
+  articles,
+  totalArticles,
+  isProcessing,
+  changePage,
+  currentPage,
+  changeFeedMode,
+} = useArticles({
+  feedMode: props.feedMode,
+});
 watch(
   () => props.feedMode,
   (newVal) => {
