@@ -18,6 +18,8 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
+
 const prop = defineProps<{
   total: number;
   pageSize: number;
@@ -28,5 +30,7 @@ const emit = defineEmits<{
   (e: "pageChange", to: number): void;
 }>();
 
-const pageCount = Math.ceil(prop.total / prop.pageSize);
+const pageCount = computed(() => {
+  return Math.ceil(prop.total / prop.pageSize);
+});
 </script>
