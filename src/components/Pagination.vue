@@ -6,7 +6,13 @@
       :key="i"
       :class="{ active: i === prop.currentPage }"
     >
-      <a class="page-link" @click="emit('pageChange', i)">{{ i }}</a>
+      <a
+        :aria-label="`Go to page ${i}`"
+        class="page-link"
+        href="javascript:"
+        @click="emit('pageChange', i)"
+        >{{ i }}</a
+      >
     </li>
   </ul>
 </template>
