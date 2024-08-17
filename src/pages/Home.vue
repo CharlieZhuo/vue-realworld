@@ -46,10 +46,18 @@ import { useArticles } from "../composable/useArticles";
 import { defaultPageSize } from "../api/apiClient";
 import { useTags } from "../composable/useTags";
 import TagList from "../components/TagList.vue";
+import { watch } from "vue";
 
-const { articles, totalArticles, changePage, currentPage } = useArticles({
-  feedMode: props.feedMode,
-});
+const { articles, totalArticles, changePage, currentPage, changeFeedMode } =
+  useArticles({
+    feedMode: props.feedMode,
+  });
+watch(
+  () => props.feedMode,
+  (newVal) => {
+    changeFeedMode(newVal);
+  }
+);
 
 const { tags } = useTags();
 </script>

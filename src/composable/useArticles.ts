@@ -13,15 +13,19 @@ export function useArticles(props: useArticlesProps) {
   const articles = ref<components["schemas"]["Article"][]>([]);
   const totalArticles = ref<number>(0);
   const currentPage = ref(1);
+  const feedMode = ref(props.feedMode);
 
   const offset = computed(() => (currentPage.value - 1) * defaultPageSize);
 
   function changePage(to: number) {
     currentPage.value = to;
   }
+  function changeFeedMode(mode: string) {
+    feedMode.value = mode;
+  }
 
   function fetchArticles() {
-    if (props.feedMode == "my") {
+    if (feedMode.value == "my") {
       ApiClient.GET("/articles/feed", {
         params: {
           query: {
@@ -41,7 +45,7 @@ export function useArticles(props: useArticlesProps) {
           query: {
             limit: defaultPageSize,
             offset: offset.value,
-            tag: props.feedMode == "global" ? undefined : props.feedMode,
+            tag: feedMode.value == "global" ? undefined : feedMode.value,
           },
         },
       }).then(({ data }) => {
@@ -57,12 +61,19 @@ export function useArticles(props: useArticlesProps) {
   });
 
   watch(
-    [currentPage],
+    [currentPage, feedMode],
     () => {
       startProcess();
     },
     { immediate: true }
   );
 
-  return { articles, totalArticles, isProcessing, currentPage, changePage };
+  return {
+    articles,
+    totalArticles,
+    isProcessing,
+    currentPage,
+    changePage,
+    changeFeedMode,
+  };
 }
