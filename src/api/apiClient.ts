@@ -19,3 +19,5 @@ export function updateClientToken(authToken?: string) {
   });
   return ApiClient;
 }
+
+export const defaultPageSize = 10;
