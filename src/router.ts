@@ -3,7 +3,20 @@ import Home from "./pages/Home.vue";
 import Article from "./pages/Article.vue";
 import { BrowserUserManager } from "./plugins/BrowserUserManager";
 export const routes: RouteRecordRaw[] = [
-  { path: "/", component: Home, name: "home" },
+  { path: "/", component: Home, name: "home", props: { feedMode: "global" } },
+  {
+    path: "/my-feeds",
+    component: Home,
+    name: "my-feeds",
+    props: { feedMode: "my" },
+  },
+  {
+    path: "/tag/:tag",
+    component: Home,
+    name: "tag-feeds",
+    props: (route) => ({ feedMode: route.params.tag }),
+  },
+
   { path: "/article/:id", component: Article, name: "article" },
   {
     path: "/login",

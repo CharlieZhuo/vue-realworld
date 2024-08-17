@@ -10,16 +10,8 @@
     <div class="container page">
       <div class="row">
         <div class="col-md-9">
-          <div class="feed-toggle">
-            <ul class="nav nav-pills outline-active">
-              <li class="nav-item">
-                <a class="nav-link" href="">Your Feed</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link active" href="">Global Feed</a>
-              </li>
-            </ul>
-          </div>
+
+          <FeedToggle :feedMode="props.feedMode" />
 
           <div class="article-preview">
             <div class="article-meta">
@@ -109,3 +101,12 @@
     </div>
   </div>
 </template>
+<script setup lang="ts">
+import FeedToggle from '../components/FeedToggle.vue';
+
+const props = defineProps<{
+  feedMode: string;
+}>();
+
+
+</script>
