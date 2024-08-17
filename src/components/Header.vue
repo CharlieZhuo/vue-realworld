@@ -27,7 +27,7 @@ import { computed, inject } from "vue";
 const userInject = inject(UserKey)!;
 
 const authenticated = computed(() =>
-  userInject.CurrentUser ? "authenticated" : "unauthenticated"
+  userInject.CurrentUser.value ? "authenticated" : "unauthenticated"
 );
 
 interface navItem {
@@ -49,9 +49,9 @@ const navItems = computed(() => {
     { name: "Sign up", toRoute: "register", authorization: "unauthenticated" },
     { name: "Sign in", toRoute: "login", authorization: "unauthenticated" },
     {
-      name: userInject?.CurrentUser?.username ?? "placeholder",
+      name: userInject?.CurrentUser?.value?.username ?? "placeholder",
       toRoute: "profile",
-      params: { username: userInject?.CurrentUser?.username ?? "placeholder" },
+      params: { username: userInject?.CurrentUser?.value?.username ?? "placeholder" },
       authorization: "authenticated",
     },
   ] as navItem[];

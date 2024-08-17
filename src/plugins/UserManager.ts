@@ -1,10 +1,10 @@
-import { InjectionKey, Plugin, ref } from "vue";
+import { InjectionKey, Plugin, Ref, ref } from "vue";
 
 import type { components } from "../api/schema";
 type User = components["schemas"]["User"];
 
 export interface ProvidedUserInterface {
-  CurrentUser: User | null;
+  CurrentUser: Ref<User | null>;
   UpdateCurrentUser: (user: User) => void;
   RemoveCurrentUser: () => void;
 }
@@ -38,7 +38,7 @@ export function createUserPlugin(userStore: Store<User>): Plugin {
     install(app) {
       const userRef = ref(userStore.get());
       app.provide(UserKey, {
-        CurrentUser: userRef.value,
+        CurrentUser: userRef,
         UpdateCurrentUser: (user: User) => {
           userStore.set(user);
           userRef.value = user;

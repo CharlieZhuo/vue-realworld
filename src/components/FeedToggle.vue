@@ -13,6 +13,10 @@
   </div>
 </template>
 <script setup lang="ts">
+import { computed, inject } from "vue";
+import { UserKey } from "../plugins/UserManager";
+
+const userInject = inject(UserKey);
 const props = defineProps<{
   feedMode: string;
 }>();
@@ -22,21 +26,27 @@ interface tab {
   params?: Record<string, string>;
   label: string;
 }
-const tabs: tab[] = [
-  {
-    routeName: "my-feeds",
-    label: "Your Feed",
-  },
-  {
-    routeName: "home",
-    label: "Global Feed",
-  },
-];
-if (props.feedMode != "global" && props.feedMode != "my") {
-  tabs.push({
-    routeName: "tag-feeds",
-    label: `#${props.feedMode}`,
-    params: { tag: props.feedMode },
-  });
-}
+const tabs = computed(() => {
+  const output: tab[] = [
+    {
+      routeName: "home",
+      label: "Global Feed",
+    },
+  ];
+
+  if (userInject && userInject.CurrentUser.value) {
+    output.push({
+      routeName: "my-feeds",
+      label: "Your Feed",
+    });
+  }
+  if (props.feedMode != "global" && props.feedMode != "my") {
+    output.push({
+      routeName: "tag-feeds",
+      label: `#${props.feedMode}`,
+      params: { tag: props.feedMode },
+    });
+  }
+  return output;
+});
 </script>
