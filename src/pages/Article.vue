@@ -1,25 +1,14 @@
 <template>
-  <div class="article-page">
+  <div class="article-page" v-if="article">
     <div class="banner">
       <div class="container">
-        <h1>How to build webapps that scale</h1>
+        <h1>{{ article.title }}</h1>
 
-        <div class="article-meta">
-          <a href=""><img src="http://i.imgur.com/Qr71crq.jpg" /></a>
-          <div class="info">
-            <a href="" class="author">Eric Simons</a>
-            <span class="date">January 20th</span>
-          </div>
-          <button class="btn btn-sm btn-outline-secondary">
-            <i class="ion-plus-round"></i>
-            &nbsp; Follow Eric Simons <span class="counter">(10)</span>
-          </button>
-          &nbsp;&nbsp;
-          <button class="btn btn-sm btn-outline-primary">
-            <i class="ion-heart"></i>
-            &nbsp; Favorite Post <span class="counter">(29)</span>
-          </button>
-        </div>
+        <ArticleMeta
+          :article="article"
+          @author-change="handleAuthorChange"
+          @article-change="handleArticleChange"
+        />
       </div>
     </div>
 
@@ -38,25 +27,11 @@
       <hr />
 
       <div class="article-actions">
-        <div class="article-meta">
-          <a href="profile.html"
-            ><img src="http://i.imgur.com/Qr71crq.jpg"
-          /></a>
-          <div class="info">
-            <a href="" class="author">Eric Simons</a>
-            <span class="date">January 20th</span>
-          </div>
-
-          <button class="btn btn-sm btn-outline-secondary">
-            <i class="ion-plus-round"></i>
-            &nbsp; Follow Eric Simons <span class="counter">(10)</span>
-          </button>
-          &nbsp;
-          <button class="btn btn-sm btn-outline-primary">
-            <i class="ion-heart"></i>
-            &nbsp; Favorite Post <span class="counter">(29)</span>
-          </button>
-        </div>
+        <ArticleMeta
+          :article="article"
+          @author-change="handleAuthorChange"
+          @article-change="handleArticleChange"
+        />
       </div>
 
       <div class="row">
@@ -126,3 +101,36 @@
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { ref } from "vue";
+import { components } from "../api/schema";
+type articleType = components["schemas"]["Article"];
+import ArticleMeta from "../components/ArticleMeta.vue";
+import { useOneArticle } from "../composable/useOneArticle";
+
+const { slug } = defineProps<{
+  slug: string;
+}>();
+
+const { isProcessing, startProcess } = useOneArticle(slug);
+
+const article = ref<articleType>();
+startProcess()
+  .then((p) => p)
+  .then(
+    (fetchedArticle) => {
+      article.value = fetchedArticle;
+    },
+    (error) => {
+      console.error(error);
+    }
+  );
+
+const handleArticleChange = (newArticle: articleType) => {
+  article.value = newArticle;
+};
+const handleAuthorChange = (newAuthor: components["schemas"]["Profile"]) => {
+  if (article.value) article.value.author = newAuthor;
+};
+</script>

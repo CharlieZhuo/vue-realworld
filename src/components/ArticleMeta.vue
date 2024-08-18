@@ -39,12 +39,13 @@
       @click="onFavButtonClick"
     >
       <i class="ion-heart"></i>
-      &nbsp; Favorite Post
+      &nbsp; {{ article.favorited ? "Unfavorite" : "Favorite" }} Post
       <span class="counter">({{ article.favoritesCount }})</span>
     </button>
   </div>
 </template>
 <script setup lang="ts">
+import { computed } from "vue";
 import { components } from "../api/schema";
 import { useFavorite } from "../composable/useFavorite";
 import { useFollow } from "../composable/useFollow";
@@ -59,7 +60,9 @@ const emits = defineEmits<{
   (e: "authorChange", author: components["schemas"]["Profile"]): void;
 }>();
 
-const author = article.author;
+const author = computed(() => {
+  return article.author;
+});
 const {
   isProcessing: isFavoriteProcessing,
   startFavorite,
@@ -82,11 +85,11 @@ const {
   isProcessing: isFollowProcessing,
   startFollow,
   startUnFollow,
-} = useFollow(author.username);
+} = useFollow(author.value.username);
 
 async function onFollowButtonClick() {
   let result: undefined | components["schemas"]["Profile"];
-  if (author.following) {
+  if (author.value.following) {
     result = await startUnFollow();
   } else {
     result = await startFollow();

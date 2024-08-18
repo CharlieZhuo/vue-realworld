@@ -1,3 +1,4 @@
+import { computed } from "vue";
 import { ApiClient } from "../api/apiClient";
 import { useAsync } from "./useAsync";
 
@@ -31,8 +32,12 @@ export function useFavorite(slug: string) {
   const { isProcessing: isFavoriteRemoving, startProcess: startUnFavorite } =
     useAsync(unFavoriteArticle);
 
+  const isProcessing = computed(
+    () => isFavoriteProcessing.value || isFavoriteRemoving.value
+  );
+
   return {
-    isProcessing: isFavoriteProcessing || isFavoriteRemoving,
+    isProcessing,
     startFavorite,
     startUnFavorite,
   };
