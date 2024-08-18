@@ -13,12 +13,12 @@
           <FeedToggle :feedMode="props.feedMode" />
 
           <ArticlePreview
-            v-if="!isProcessing"
+            v-if="!isArticlesLoading"
             v-for="article in articles"
             :key="article.slug"
             :article="article"
           />
-          <div class="article-preview" v-if="isProcessing">
+          <div class="article-preview" v-if="isArticlesLoading">
             Loading articles
           </div>
 
@@ -29,7 +29,7 @@
             @page-change="changePage"
           />
         </div>
-        <TagList :tags="tags" />
+        <TagList :tags="tags" :loading="isTagsLoading" />
       </div>
     </div>
   </div>
@@ -55,7 +55,7 @@ import { watch } from "vue";
 const {
   articles,
   totalArticles,
-  isProcessing,
+  isProcessing: isArticlesLoading,
   changePage,
   currentPage,
   changeFeedMode,
@@ -69,5 +69,5 @@ watch(
   }
 );
 
-const { tags } = useTags();
+const { tags, isProcessing: isTagsLoading } = useTags();
 </script>

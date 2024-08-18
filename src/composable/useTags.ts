@@ -5,7 +5,7 @@ import { useAsync } from "./useAsync";
 export function useTags() {
   const tags = ref<string[]>([]);
   const fetchTags = () => {
-    ApiClient.GET("/tags").then(({ data }) => {
+    return ApiClient.GET("/tags").then(({ data }) => {
       if (data) {
         tags.value = data.tags;
       }

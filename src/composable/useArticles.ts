@@ -26,7 +26,7 @@ export function useArticles(props: useArticlesProps) {
 
   function fetchArticles() {
     if (feedMode.value == "my") {
-      ApiClient.GET("/articles/feed", {
+      return ApiClient.GET("/articles/feed", {
         params: {
           query: {
             limit: defaultPageSize,
@@ -40,7 +40,7 @@ export function useArticles(props: useArticlesProps) {
         }
       });
     } else {
-      ApiClient.GET("/articles", {
+      return ApiClient.GET("/articles", {
         params: {
           query: {
             limit: defaultPageSize,
