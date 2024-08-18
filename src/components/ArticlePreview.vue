@@ -20,7 +20,18 @@
         </RouterLink>
         <span class="date">{{ article.createdAt }}</span>
       </div>
-      <button class="btn btn-outline-primary btn-sm pull-xs-right">
+      <button
+        :aria-label="
+          article.favorited ? 'Unfavorite article' : 'Favorite article'
+        "
+        class="btn btn-sm pull-xs-right"
+        :class="{
+          'btn-primary': article.favorited,
+          'btn-outline-primary': !article.favorited,
+        }"
+        :disabled="isProcessing"
+        @click="onFavButtonClick"
+      >
         <i class="ion-heart"></i> {{ article.favoritesCount }}
       </button>
     </div>
@@ -43,7 +54,31 @@
   </div>
 </template>
 <script setup lang="ts">
+import { ref } from "vue";
 import { components } from "../api/schema";
 
-const {article} = defineProps<{ article: components["schemas"]["Article"] }>();
+const { article: articleProp } = defineProps<{
+  article: components["schemas"]["Article"];
+}>();
+
+const article = ref(articleProp);
+
+import { useFavorite } from "../composable/useFavorite";
+const { isProcessing, startFavorite, startUnFavorite } = useFavorite(
+  article.value.slug
+);
+
+async function onFavButtonClick() {
+  let result:
+    | undefined
+    | components["schemas"]["Article"];
+  if (article.value.favorited) {
+    result = await startUnFavorite();
+  } else {
+    result = await startFavorite();
+  }
+  if (result) {
+    article.value = result;
+  }
+}
 </script>
