@@ -58,6 +58,7 @@ export function useArticles(props: useArticlesProps) {
   }
   const { startProcess, isProcessing } = useAsync(fetchArticles);
 
+  //FeedMode改变时，重置页码并重新获取数据
   watch(feedMode, () => {
     if (currentPage.value == 1) {
       startProcess();
