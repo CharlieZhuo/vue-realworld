@@ -1,3 +1,4 @@
+import { computed } from "vue";
 import { ApiClient } from "../api/apiClient";
 import { useAsync } from "./useAsync";
 export function useFollow(username: string) {
@@ -11,7 +12,7 @@ export function useFollow(username: string) {
     });
   };
   const unFollowUser = async () => {
-    return ApiClient.POST("/profiles/{username}/follow", {
+    return ApiClient.DELETE("/profiles/{username}/follow", {
       params: { path: { username: username } },
     }).then(({ data, error }) => {
       if (!data || error) {
@@ -23,5 +24,7 @@ export function useFollow(username: string) {
   const { isProcessing: isuf, startProcess: startUnFollow } =
     useAsync(unFollowUser);
 
-  return { isProcessing: isf || isuf, startFollow, startUnFollow };
+  const isProcessing = computed(() => isf.value || isuf.value);
+
+  return { isProcessing: isProcessing, startFollow, startUnFollow };
 }
