@@ -19,11 +19,11 @@ export function useOneArticle(slug: string) {
     });
   };
 
-  function changeArticle(newArticle: components["schemas"]["Article"]) {
+  function changeArticleLocally(newArticle: components["schemas"]["Article"]) {
     article.value = newArticle;
   }
 
-  function changeAuthor(newAuthor: components["schemas"]["Profile"]) {
+  function changeAuthorLocally(newAuthor: components["schemas"]["Profile"]) {
     if (article.value) {
       article.value.author = newAuthor;
     }
@@ -32,5 +32,11 @@ export function useOneArticle(slug: string) {
   const { isProcessing, startProcess } = useAsync(getArticle);
   startProcess();
 
-  return { article, changeArticle, changeAuthor, isProcessing, startProcess };
+  return {
+    article,
+    changeArticleLocally,
+    changeAuthorLocally,
+    isProcessing,
+    startProcess,
+  };
 }

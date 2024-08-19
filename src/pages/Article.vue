@@ -6,8 +6,8 @@
 
         <ArticleMeta
           :article="article"
-          @author-change="changeAuthor"
-          @article-change="changeArticle"
+          @author-change="changeAuthorLocally"
+          @article-change="changeArticleLocally"
         />
       </div>
     </div>
@@ -20,8 +20,8 @@
       <div class="article-actions">
         <ArticleMeta
           :article="article"
-          @author-change="changeAuthor"
-          @article-change="changeArticle"
+          @author-change="changeAuthorLocally"
+          @article-change="changeArticleLocally"
         />
       </div>
 
@@ -41,5 +41,6 @@ const { slug } = defineProps<{
   slug: string;
 }>();
 
-const { article, changeArticle, changeAuthor } = useOneArticle(slug);
+const { article, changeArticleLocally, changeAuthorLocally } =
+  useOneArticle(slug);
 </script>
