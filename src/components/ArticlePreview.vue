@@ -18,7 +18,7 @@
         >
           {{ article.author.username }}
         </RouterLink>
-        <span class="date">{{ article.createdAt }}</span>
+        <span class="date">{{ new Date( article.createdAt).toLocaleDateString() }}</span>
       </div>
       <button
         :aria-label="
