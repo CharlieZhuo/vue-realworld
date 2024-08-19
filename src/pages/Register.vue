@@ -57,7 +57,7 @@ type RegisterType = components["schemas"]["NewUser"];
 import { useRouter } from "vue-router";
 import { AppRouteNames } from "../router";
 import { UserKey } from "../plugins/UserManager";
-import { getApiClient } from "../api/apiClient";
+import { ApiClient } from "../api/apiClient";
 
 const router = useRouter();
 const userInject = inject(UserKey);
@@ -77,9 +77,8 @@ function onSubmit() {
     return;
   }
   errorMessages.value = [];
-  getApiClient()
-    .POST("/users", { body: { user: formState.value } })
-    .then((rawResponse) => {
+  ApiClient.POST("/users", { body: { user: formState.value } }).then(
+    (rawResponse) => {
       if (!rawResponse.data) {
         errorMessages.value.push(rawResponse.response.statusText);
         return;
@@ -88,6 +87,7 @@ function onSubmit() {
         if (userInject) userInject.UpdateCurrentUser(user);
         router.push({ name: "home" as AppRouteNames });
       }
-    });
+    }
+  );
 }
 </script>
