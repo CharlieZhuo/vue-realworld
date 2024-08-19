@@ -10,6 +10,7 @@
     "test": "vitest"
   },
   "dependencies": {
+    "marked": "^14.0.0",
     "openapi-fetch": "^0.11.0",
     "vue": "^3.4.35",
     "vue-router": "^4.4.3"
