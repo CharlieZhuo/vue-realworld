@@ -2,6 +2,7 @@ import { createWebHashHistory, createRouter, RouteRecordRaw } from "vue-router";
 import Home from "./pages/Home.vue";
 import Article from "./pages/Article.vue";
 import { BrowserUserManager } from "./plugins/BrowserUserManager";
+
 export const routes: RouteRecordRaw[] = [
   { path: "/", component: Home, name: "home", props: { feedMode: "global" } },
   {
@@ -9,6 +10,9 @@ export const routes: RouteRecordRaw[] = [
     component: Home,
     name: "my-feeds",
     props: { feedMode: "my" },
+    beforeEnter: () => {
+      return BrowserUserManager.IsLoggedIn() ? true : { name: "home" };
+    },
   },
   {
     path: "/tag/:tag",
@@ -17,7 +21,14 @@ export const routes: RouteRecordRaw[] = [
     props: (route) => ({ feedMode: route.params.tag }),
   },
 
-  { path: "/article/:id", component: Article, name: "article" },
+  {
+    path: "/article/:id",
+    component: Article,
+    name: "article",
+    props: (route) => ({
+      slug: route.params.id,
+    }),
+  },
   {
     path: "/login",
     component: () => import("./pages/Login.vue"),
@@ -35,21 +46,29 @@ export const routes: RouteRecordRaw[] = [
     alias: "/profile/:username/favorites",
     component: () => import("./pages/Profile.vue"),
     name: "profile",
+    beforeEnter: () => BrowserUserManager.IsLoggedIn(),
   },
   {
     path: "/settings",
     component: () => import("./pages/Setting.vue"),
     name: "settings",
+    beforeEnter: () => BrowserUserManager.IsLoggedIn(),
   },
   {
     path: "/editor",
     component: () => import("./pages/Editor.vue"),
     name: "create-article",
+    beforeEnter: () => BrowserUserManager.IsLoggedIn(),
   },
   {
     path: "/editor/:articleId",
     component: () => import("./pages/Editor.vue"),
     name: "edit-article",
+    props: (route) => ({
+      articleId: route.params.articleId,
+    }),
+
+    beforeEnter: () => BrowserUserManager.IsLoggedIn(),
   },
 ];
 export type AppRouteNames =

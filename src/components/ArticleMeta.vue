@@ -12,7 +12,9 @@
       >
         {{ author.username }}
       </RouterLink>
-      <span class="date">{{ new Date(article.createdAt).toLocaleDateString()  }}</span>
+      <span class="date">{{
+        new Date(article.createdAt).toLocaleDateString()
+      }}</span>
     </div>
 
     <button
@@ -42,14 +44,33 @@
       &nbsp; {{ article.favorited ? "Unfavorite" : "Favorite" }} Post
       <span class="counter">({{ article.favoritesCount }})</span>
     </button>
+    <RouterLink
+      class="btn btn-sm btn-outline-primary"
+      v-if="doDisplayEditButton"
+      :to="{
+        name: 'edit-article',
+        params: { articleId: article.slug },
+      }"
+    >
+      <i class="ion-edit space" /> Edit Article</RouterLink
+    >
   </div>
 </template>
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, inject } from "vue";
 import { components } from "../api/schema";
 import { useFavorite } from "../composable/useFavorite";
 import { useFollow } from "../composable/useFollow";
+import { UserKey } from "../plugins/UserManager";
 type articleType = components["schemas"]["Article"];
+
+const userInject = inject(UserKey);
+const doDisplayEditButton = computed(() => {
+  if (userInject?.CurrentUser.value) {
+    return userInject.CurrentUser.value.username === article.author.username;
+  }
+  return false;
+});
 
 const { article } = defineProps<{
   article: articleType;
