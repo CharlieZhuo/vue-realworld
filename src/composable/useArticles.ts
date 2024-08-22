@@ -16,6 +16,7 @@ export function useArticles(props: useArticlesProps) {
   const articles = ref<components["schemas"]["Article"][]>([]);
   const totalArticles = ref<number>(0);
   const currentPage = ref(1);
+  const settingState = ref(props);
 
   const offset = computed(() => (currentPage.value - 1) * defaultPageSize);
 
@@ -24,7 +25,7 @@ export function useArticles(props: useArticlesProps) {
   }
 
   function fetchArticles() {
-    if (props.myFeed) {
+    if (settingState.value.myFeed) {
       return ApiClient.GET("/articles/feed", {
         params: {
           query: {
@@ -44,9 +45,9 @@ export function useArticles(props: useArticlesProps) {
           query: {
             limit: defaultPageSize,
             offset: offset.value,
-            tag: props.tagName,
-            author: props.authorName,
-            favorited: props.favoritedBy,
+            tag: settingState.value.tagName,
+            author: settingState.value.authorName,
+            favorited: settingState.value.favoritedBy,
           },
         },
       }).then(({ data }) => {
@@ -59,15 +60,22 @@ export function useArticles(props: useArticlesProps) {
   }
   const { startProcess, isProcessing } = useAsync(fetchArticles);
 
+  function changeSetting(newSetting: useArticlesProps) {
+    settingState.value = newSetting;
+  }
+
   //FeedMode改变时，重置页码并重新获取数据
   watch(
-    () => props,
+    settingState,
     () => {
       if (currentPage.value == 1) {
         startProcess();
       } else {
         currentPage.value = 1;
       }
+    },
+    {
+      deep: true,
     }
   );
 
@@ -85,5 +93,6 @@ export function useArticles(props: useArticlesProps) {
     isProcessing,
     currentPage,
     changePage,
+    changeSetting,
   };
 }

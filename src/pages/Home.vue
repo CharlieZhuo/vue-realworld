@@ -54,17 +54,27 @@ import { useArticles } from "../composable/useArticles";
 import { defaultPageSize } from "../api/apiClient";
 import { useTags } from "../composable/useTags";
 import TagList from "../components/TagList.vue";
+import { watch } from "vue";
 
 const {
   articles,
   totalArticles,
   isProcessing: isArticlesLoading,
-  changePage,
   currentPage,
+  changePage,
+  changeSetting,
 } = useArticles({
   myFeed: props.myFeed,
   tagName: props.tagName,
 });
+
+watch(
+  () => props,
+  (newProp) => {
+    changeSetting({ tagName: newProp.tagName, myFeed: newProp.myFeed });
+  },
+  { deep: true }
+);
 
 const { tags, isProcessing: isTagsLoading } = useTags();
 </script>

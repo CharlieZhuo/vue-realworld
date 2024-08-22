@@ -22,61 +22,62 @@
     <div class="container">
       <div class="row">
         <div class="col-xs-12 col-md-10 offset-md-1">
-          <div class="articles-toggle">
-            <ul class="nav nav-pills outline-active">
-              <li class="nav-item">
-                <a class="nav-link active" href="">My Articles</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="">Favorited Articles</a>
-              </li>
-            </ul>
-          </div>
+          <FeedToggle
 
-          <div class="article-preview">
-            <div class="article-meta">
-              <a href=""><img src="http://i.imgur.com/Qr71crq.jpg" /></a>
-              <div class="info">
-                <a href="" class="author">Eric Simons</a>
-                <span class="date">January 20th</span>
-              </div>
-              <button class="btn btn-outline-primary btn-sm pull-xs-right">
-                <i class="ion-heart"></i> 29
-              </button>
-            </div>
-            <a href="" class="preview-link">
-              <h1>How to build webapps that scale</h1>
-              <p>This is the description for the post.</p>
-              <span>Read more...</span>
-            </a>
+          <div class="article-preview" v-if="isProcessing">
+            Loading articles
           </div>
+          <ArticlePreview
+            v-if="!isProcessing"
+            v-for="article in articles"
+            :key="article.slug"
+            :article="article"
+          />
 
-          <div class="article-preview">
-            <div class="article-meta">
-              <a href=""><img src="http://i.imgur.com/N4VcUeJ.jpg" /></a>
-              <div class="info">
-                <a href="" class="author">Albert Pai</a>
-                <span class="date">January 20th</span>
-              </div>
-              <button class="btn btn-outline-primary btn-sm pull-xs-right">
-                <i class="ion-heart"></i> 32
-              </button>
-            </div>
-            <a href="" class="preview-link">
-              <h1>
-                The song you won't ever stop singing. No matter how hard you
-                try.
-              </h1>
-              <p>This is the description for the post.</p>
-              <span>Read more...</span>
-              <ul class="tag-list">
-                <li class="tag-default tag-pill tag-outline">Music</li>
-                <li class="tag-default tag-pill tag-outline">Song</li>
-              </ul>
-            </a>
-          </div>
+          <Pagination
+            :total="totalArticles"
+            :current-page="currentPage"
+            :page-size="defaultPageSize"
+            @page-change="changePage"
+          />
         </div>
       </div>
     </div>
   </div>
 </template>
+<script setup lang="ts">
+import { useArticles } from "../composable/useArticles";
+import FeedToggle from "../components/FeedToggle.vue";
+import Pagination from "../components/Pagination.vue";
+import ArticlePreview from "../components/ArticlePreview.vue";
+import { defaultPageSize } from "../api/apiClient";
+import { watch } from "vue";
+
+const props = defineProps<{
+  username: string;
+  favorites?: boolean;
+}>();
+
+const {
+  articles,
+  changePage,
+  currentPage,
+  isProcessing,
+  totalArticles,
+  changeSetting,
+} = useArticles({
+  authorName: props.favorites ? undefined : props.username,
+  favoritedBy: props.favorites ? props.username : undefined,
+});
+
+watch(
+  () => props,
+  (newProp) => {
+    changeSetting({
+      authorName: newProp.favorites ? undefined : newProp.username,
+      favoritedBy: newProp.favorites ? newProp.username : undefined,
+    });
+  },
+  { deep: true }
+);
+</script>
