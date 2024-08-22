@@ -17,19 +17,10 @@
       }}</span>
     </div>
 
-    <button
-      class="btn btn-sm"
-      :class="{
-        'btn-outline-secondary': !author.following,
-        'btn-secondary': author.following,
-      }"
-      :disabled="isFollowProcessing"
-      @click="onFollowButtonClick"
-    >
-      <i class="ion-plus-round"></i>
-      &nbsp; {{ author.following ? "Unfollow" : "Follow" }}
-      {{ author.username }}
-    </button>
+    <FollowButton
+      :author="author"
+      @author-change="(author) => emits('authorChange', author)"
+    />
     &nbsp;
     <button
       class="btn btn-sm"
@@ -60,8 +51,8 @@
 import { computed, inject } from "vue";
 import { components } from "../api/schema";
 import { useFavorite } from "../composable/useFavorite";
-import { useFollow } from "../composable/useFollow";
 import { UserKey } from "../plugins/UserManager";
+import FollowButton from "./FollowButton.vue";
 type articleType = components["schemas"]["Article"];
 
 const userInject = inject(UserKey);
@@ -102,21 +93,4 @@ async function onFavButtonClick() {
   }
 }
 
-const {
-  isProcessing: isFollowProcessing,
-  startFollow,
-  startUnFollow,
-} = useFollow(author.value.username);
-
-async function onFollowButtonClick() {
-  let result: undefined | components["schemas"]["Profile"];
-  if (author.value.following) {
-    result = await startUnFollow();
-  } else {
-    result = await startFollow();
-  }
-  if (result) {
-    emits("authorChange", result);
-  }
-}
 </script>
