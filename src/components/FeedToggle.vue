@@ -18,7 +18,7 @@ import { UserKey } from "../plugins/UserManager";
 
 const userInject = inject(UserKey);
 const props = defineProps<{
-  feedMode: string;
+  tagName?: string;
 }>();
 
 interface tab {
@@ -40,11 +40,11 @@ const tabs = computed(() => {
       label: "Your Feed",
     });
   }
-  if (props.feedMode != "global" && props.feedMode != "my") {
+  if (props.tagName) {
     output.push({
       routeName: "tag-feeds",
-      label: `#${props.feedMode}`,
-      params: { tag: props.feedMode },
+      label: `#${props.tagName}`,
+      params: { tag: props.tagName },
     });
   }
   return output;

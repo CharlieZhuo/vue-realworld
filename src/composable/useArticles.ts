@@ -3,7 +3,10 @@ import { ApiClient } from "../api/apiClient";
 import { computed, ref, watch } from "vue";
 
 export interface useArticlesProps {
-  feedMode: "global" | "my" | string;
+  myFeed?: boolean;
+  tagName?: string;
+  authorName?: string;
+  favoritedBy?: string;
 }
 
 import { useAsync } from "./useAsync";
@@ -13,19 +16,15 @@ export function useArticles(props: useArticlesProps) {
   const articles = ref<components["schemas"]["Article"][]>([]);
   const totalArticles = ref<number>(0);
   const currentPage = ref(1);
-  const feedMode = ref(props.feedMode);
 
   const offset = computed(() => (currentPage.value - 1) * defaultPageSize);
 
   function changePage(to: number) {
     currentPage.value = to;
   }
-  function changeFeedMode(mode: string) {
-    feedMode.value = mode;
-  }
 
   function fetchArticles() {
-    if (feedMode.value == "my") {
+    if (props.myFeed) {
       return ApiClient.GET("/articles/feed", {
         params: {
           query: {
@@ -45,7 +44,9 @@ export function useArticles(props: useArticlesProps) {
           query: {
             limit: defaultPageSize,
             offset: offset.value,
-            tag: feedMode.value == "global" ? undefined : feedMode.value,
+            tag: props.tagName,
+            author: props.authorName,
+            favorited: props.favoritedBy,
           },
         },
       }).then(({ data }) => {
@@ -59,13 +60,16 @@ export function useArticles(props: useArticlesProps) {
   const { startProcess, isProcessing } = useAsync(fetchArticles);
 
   //FeedMode改变时，重置页码并重新获取数据
-  watch(feedMode, () => {
-    if (currentPage.value == 1) {
-      startProcess();
-    } else {
-      currentPage.value = 1;
+  watch(
+    () => props,
+    () => {
+      if (currentPage.value == 1) {
+        startProcess();
+      } else {
+        currentPage.value = 1;
+      }
     }
-  });
+  );
 
   watch(
     [currentPage],
@@ -81,6 +85,5 @@ export function useArticles(props: useArticlesProps) {
     isProcessing,
     currentPage,
     changePage,
-    changeFeedMode,
   };
 }

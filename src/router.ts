@@ -4,12 +4,12 @@ import Article from "./pages/Article.vue";
 import { BrowserUserManager } from "./plugins/BrowserUserManager";
 
 export const routes: RouteRecordRaw[] = [
-  { path: "/", component: Home, name: "home", props: { feedMode: "global" } },
+  { path: "/", component: Home, name: "home" },
   {
     path: "/my-feeds",
     component: Home,
     name: "my-feeds",
-    props: { feedMode: "my" },
+    props: { myFeed: true },
     beforeEnter: () => {
       return BrowserUserManager.IsLoggedIn() ? true : { name: "home" };
     },
@@ -18,7 +18,7 @@ export const routes: RouteRecordRaw[] = [
     path: "/tag/:tag",
     component: Home,
     name: "tag-feeds",
-    props: (route) => ({ feedMode: route.params.tag }),
+    props: (route) => ({ tagName: route.params.tag }),
   },
 
   {
@@ -43,10 +43,17 @@ export const routes: RouteRecordRaw[] = [
   },
   {
     path: "/profile/:username",
-    alias: "/profile/:username/favorites",
     component: () => import("./pages/Profile.vue"),
     name: "profile",
     beforeEnter: () => BrowserUserManager.IsLoggedIn(),
+    props: { feedMode: "profile" },
+  },
+  {
+    path: "/profile/:username/favorites",
+    component: () => import("./pages/Profile.vue"),
+    name: "profile-favorites",
+    beforeEnter: () => BrowserUserManager.IsLoggedIn(),
+    props: { feedMode: "favorites" },
   },
   {
     path: "/settings",

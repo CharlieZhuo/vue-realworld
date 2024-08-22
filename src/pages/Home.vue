@@ -10,7 +10,7 @@
     <div class="container page">
       <div class="row">
         <div class="col-md-9">
-          <FeedToggle :feedMode="props.feedMode" />
+          <FeedToggle :tag-name="props.tagName"/>
 
           <ArticlePreview
             v-if="!isArticlesLoading"
@@ -40,9 +40,13 @@ import Pagination from "../components/Pagination.vue";
 import ArticlePreview from "../components/ArticlePreview.vue";
 
 const props = defineProps({
-  feedMode: {
+  myFeed: {
+    type: Boolean,
+    default: false,
+  },
+  tagName: {
     type: String,
-    default: "global",
+    required: false,
   },
 });
 
@@ -50,7 +54,6 @@ import { useArticles } from "../composable/useArticles";
 import { defaultPageSize } from "../api/apiClient";
 import { useTags } from "../composable/useTags";
 import TagList from "../components/TagList.vue";
-import { watch } from "vue";
 
 const {
   articles,
@@ -58,16 +61,10 @@ const {
   isProcessing: isArticlesLoading,
   changePage,
   currentPage,
-  changeFeedMode,
 } = useArticles({
-  feedMode: props.feedMode,
+  myFeed: props.myFeed,
+  tagName: props.tagName,
 });
-watch(
-  () => props.feedMode,
-  (newVal) => {
-    changeFeedMode(newVal);
-  }
-);
 
 const { tags, isProcessing: isTagsLoading } = useTags();
 </script>
