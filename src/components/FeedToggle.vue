@@ -18,7 +18,13 @@ import { UserKey } from "../plugins/UserManager";
 
 const userInject = inject(UserKey);
 const props = defineProps<{
-  tagName?: string;
+  homePage?: {
+    tagName?: string;
+  };
+  profilePage?: {
+    useName: string;
+    favorited?: boolean;
+  };
 }>();
 
 interface tab {
@@ -27,24 +33,36 @@ interface tab {
   label: string;
 }
 const tabs = computed(() => {
-  const output: tab[] = [
-    {
+  const output: tab[] = [];
+
+  if (props.homePage) {
+    output.push({
       routeName: "home",
       label: "Global Feed",
-    },
-  ];
-
-  if (userInject && userInject.CurrentUser.value) {
-    output.push({
-      routeName: "my-feeds",
-      label: "Your Feed",
     });
-  }
-  if (props.tagName) {
+    if (userInject && userInject.CurrentUser.value) {
+      output.push({
+        routeName: "my-feeds",
+        label: "Your Feed",
+      });
+    }
+    if (props.homePage.tagName) {
+      output.push({
+        routeName: "tag-feeds",
+        label: `#${props.homePage.tagName}`,
+        params: { tag: props.homePage.tagName },
+      });
+    }
+  } else if (props.profilePage) {
     output.push({
-      routeName: "tag-feeds",
-      label: `#${props.tagName}`,
-      params: { tag: props.tagName },
+      routeName: "profile",
+      label: "My Articles",
+      params: { username: props.profilePage.useName },
+    });
+    output.push({
+      routeName: "profile-favorites",
+      label: "Favorited Articles",
+      params: { username: props.profilePage.useName },
     });
   }
   return output;

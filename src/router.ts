@@ -46,14 +46,14 @@ export const routes: RouteRecordRaw[] = [
     component: () => import("./pages/Profile.vue"),
     name: "profile",
     beforeEnter: () => BrowserUserManager.IsLoggedIn(),
-    props: { feedMode: "profile" },
+    props: (route) => ({ username: route.params.username }),
   },
   {
     path: "/profile/:username/favorites",
     component: () => import("./pages/Profile.vue"),
     name: "profile-favorites",
     beforeEnter: () => BrowserUserManager.IsLoggedIn(),
-    props: { feedMode: "favorites" },
+    props: (route) => ({ username: route.params.username, favorites: true }),
   },
   {
     path: "/settings",

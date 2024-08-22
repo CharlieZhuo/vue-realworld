@@ -10,7 +10,7 @@
     <div class="container page">
       <div class="row">
         <div class="col-md-9">
-          <FeedToggle :tag-name="props.tagName"/>
+          <FeedToggle :home-page="{ tagName: props.tagName }" />
 
           <ArticlePreview
             v-if="!isArticlesLoading"

@@ -23,6 +23,11 @@
       <div class="row">
         <div class="col-xs-12 col-md-10 offset-md-1">
           <FeedToggle
+            :profile-page="{
+              useName: props.username,
+              favorited: props.favorites,
+            }"
+          />
 
           <div class="article-preview" v-if="isProcessing">
             Loading articles
