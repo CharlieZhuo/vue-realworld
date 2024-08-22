@@ -2,18 +2,14 @@
   <div class="profile-page">
     <div class="user-info">
       <div class="container">
-        <div class="row">
+        <div class="row" v-if="!isProfileProcessing && profile">
           <div class="col-xs-12 col-md-10 offset-md-1">
-            <img src="http://i.imgur.com/Qr71crq.jpg" class="user-img" />
-            <h4>Eric Simons</h4>
+            <img :src="profile.image" class="user-img" />
+            <h4>{{ profile.username }}</h4>
             <p>
-              Cofounder @GoThinkster, lived in Aol's HQ for a few months, kinda
-              looks like Peeta from the Hunger Games
+              {{ profile.bio }}
             </p>
-            <button class="btn btn-sm btn-outline-secondary action-btn">
-              <i class="ion-plus-round"></i>
-              &nbsp; Follow Eric Simons
-            </button>
+            <FollowButton :author="profile" />
           </div>
         </div>
       </div>
@@ -29,11 +25,11 @@
             }"
           />
 
-          <div class="article-preview" v-if="isProcessing">
+          <div class="article-preview" v-if="isArticleProcessing">
             Loading articles
           </div>
           <ArticlePreview
-            v-if="!isProcessing"
+            v-if="!isArticleProcessing"
             v-for="article in articles"
             :key="article.slug"
             :article="article"
@@ -57,6 +53,8 @@ import Pagination from "../components/Pagination.vue";
 import ArticlePreview from "../components/ArticlePreview.vue";
 import { defaultPageSize } from "../api/apiClient";
 import { watch } from "vue";
+import { useProfile } from "../composable/useProfile";
+import FollowButton from "../components/FollowButton.vue";
 
 const props = defineProps<{
   username: string;
@@ -67,7 +65,7 @@ const {
   articles,
   changePage,
   currentPage,
-  isProcessing,
+  isProcessing: isArticleProcessing,
   totalArticles,
   changeSetting,
 } = useArticles({
@@ -84,5 +82,9 @@ watch(
     });
   },
   { deep: true }
+);
+
+const { profile, isProcessing: isProfileProcessing } = useProfile(
+  props.username
 );
 </script>
