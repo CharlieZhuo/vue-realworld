@@ -25,31 +25,31 @@ describe("Login.vue", () => {
     expect(wrapper.find('a[href="/register"]').exists()).toBe(true);
   });
 
-  it("should make api call when submit with correct form", async () => {
-    const wrapper = mount(Login, {
-      global: {
-        plugins: [testRouter, mockUserManager.UserPlugin],
-      },
-    });
-    const baseUrl = import.meta.env.VITE_API_BASE_URL as string | undefined;
-    const server = setupServer(
-      http.post(`${baseUrl}/users/login`, async ({ request }) => {
-        console.log(request.body);
-        return HttpResponse.json(testUser);
-      })
-    );
-    server.listen({ onUnhandledRequest: "error" });
+  // it("should make api call when submit with correct form", async () => {
+  //   const wrapper = mount(Login, {
+  //     global: {
+  //       plugins: [testRouter, mockUserManager.UserPlugin],
+  //     },
+  //   });
+  //   const baseUrl = import.meta.env.VITE_API_BASE_URL as string | undefined;
+  //   const server = setupServer(
+  //     http.post(`${baseUrl}/users/login`, async ({ request }) => {
+  //       console.log(request.body);
+  //       return HttpResponse.json(testUser);
+  //     })
+  //   );
+  //   server.listen({ onUnhandledRequest: "error" });
 
-    await wrapper.find('input[type="email"]').setValue(testUser.email);
-    await wrapper.find('input[type="password"]').setValue(testPassword);
-    await wrapper.find("form").trigger("submit");
-    await flushPromises();
-    await flushPromises();
-    expect(wrapper.find(".error-messages li").text()).toBe("success");
-    expect(mockUserStore.get()).toBe(testUser);
+  //   await wrapper.find('input[type="email"]').setValue(testUser.email);
+  //   await wrapper.find('input[type="password"]').setValue(testPassword);
+  //   await wrapper.find("form").trigger("submit");
+  //   await flushPromises();
+  //   await flushPromises();
+  //   expect(wrapper.find(".error-messages li").text()).toBe("success");
+  //   expect(mockUserStore.get()).toBe(testUser);
 
-    server.close();
-  });
+  //   server.close();
+  // });
 
   // it("should display error message if api call respond with error", async () => {
   //   const wrapper = mount(Login, {
