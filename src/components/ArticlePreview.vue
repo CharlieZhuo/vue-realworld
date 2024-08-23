@@ -18,22 +18,14 @@
         >
           {{ article.author.username }}
         </RouterLink>
-        <span class="date">{{ new Date( article.createdAt).toLocaleDateString() }}</span>
+        <span class="date">{{
+          new Date(article.createdAt).toLocaleDateString()
+        }}</span>
       </div>
-      <button
-        :aria-label="
-          article.favorited ? 'Unfavorite article' : 'Favorite article'
-        "
-        class="btn btn-sm pull-xs-right"
-        :class="{
-          'btn-primary': article.favorited,
-          'btn-outline-primary': !article.favorited,
-        }"
-        :disabled="isProcessing"
-        @click="onFavButtonClick"
-      >
-        <i class="ion-heart"></i> {{ article.favoritesCount }}
-      </button>
+      <FavoriteButton
+        :article="article"
+        @article-change="(article) => (article = article)"
+      />
     </div>
     <RouterLink
       :to="{ name: 'article', params: { id: article.slug } }"
@@ -56,29 +48,11 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { components } from "../api/schema";
+import FavoriteButton from "./FavoriteButton.vue";
 
 const { article: articleProp } = defineProps<{
   article: components["schemas"]["Article"];
 }>();
 
 const article = ref(articleProp);
-
-import { useFavorite } from "../composable/useFavorite";
-const { isProcessing, startFavorite, startUnFavorite } = useFavorite(
-  article.value.slug
-);
-
-async function onFavButtonClick() {
-  let result:
-    | undefined
-    | components["schemas"]["Article"];
-  if (article.value.favorited) {
-    result = await startUnFavorite();
-  } else {
-    result = await startFavorite();
-  }
-  if (result) {
-    article.value = result;
-  }
-}
 </script>

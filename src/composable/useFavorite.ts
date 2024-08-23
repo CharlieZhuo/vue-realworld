@@ -6,9 +6,9 @@ export function useFavorite(slug: string) {
   function favoriteArticle() {
     return ApiClient.POST(`/articles/{slug}/favorite`, {
       params: { path: { slug: slug } },
-    }).then(({ data, error }) => {
-      if (!data || error) {
-        console.error(error);
+    }).then(({ data }) => {
+      if (!data) {
+        console.error(`Error while favoriting article ${slug}`);
       } else {
         return data.article;
       }
@@ -18,9 +18,9 @@ export function useFavorite(slug: string) {
   function unFavoriteArticle() {
     return ApiClient.DELETE(`/articles/{slug}/favorite`, {
       params: { path: { slug: slug } },
-    }).then(({ data, error }) => {
-      if (!data || error) {
-        console.error(error);
+    }).then(({ data }) => {
+      if (!data) {
+        console.error(`Error while unfavoriting article ${slug}`);
       } else {
         return data.article;
       }

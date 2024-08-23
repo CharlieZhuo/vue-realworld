@@ -22,19 +22,10 @@
       @author-change="(author) => emits('authorChange', author)"
     />
     &nbsp;
-    <button
-      class="btn btn-sm"
-      :class="{
-        'btn-outline-primary': !article.favorited,
-        'btn-primary': article.favorited,
-      }"
-      :disabled="isFavoriteProcessing"
-      @click="onFavButtonClick"
-    >
-      <i class="ion-heart"></i>
-      &nbsp; {{ article.favorited ? "Unfavorite" : "Favorite" }} Post
-      <span class="counter">({{ article.favoritesCount }})</span>
-    </button>
+    <FavoriteButton
+      :article="article"
+      @article-change="(article) => emits('articleChange', article)"
+    />
     <RouterLink
       class="btn btn-sm btn-outline-primary"
       v-if="doDisplayEditButton"
@@ -50,9 +41,9 @@
 <script setup lang="ts">
 import { computed, inject } from "vue";
 import { components } from "../api/schema";
-import { useFavorite } from "../composable/useFavorite";
 import { UserKey } from "../plugins/UserManager";
 import FollowButton from "./FollowButton.vue";
+import FavoriteButton from "./FavoriteButton.vue";
 type articleType = components["schemas"]["Article"];
 
 const userInject = inject(UserKey);
@@ -75,22 +66,4 @@ const emits = defineEmits<{
 const author = computed(() => {
   return article.author;
 });
-const {
-  isProcessing: isFavoriteProcessing,
-  startFavorite,
-  startUnFavorite,
-} = useFavorite(article.slug);
-
-async function onFavButtonClick() {
-  let result: undefined | components["schemas"]["Article"];
-  if (article.favorited) {
-    result = await startUnFavorite();
-  } else {
-    result = await startFavorite();
-  }
-  if (result) {
-    emits("articleChange", result);
-  }
-}
-
 </script>
