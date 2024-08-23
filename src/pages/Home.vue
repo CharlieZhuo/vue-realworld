@@ -23,6 +23,7 @@
           </div>
 
           <Pagination
+            v-if="!isArticlesLoading"
             :total="totalArticles"
             :current-page="currentPage"
             :page-size="defaultPageSize"

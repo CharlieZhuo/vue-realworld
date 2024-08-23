@@ -36,6 +36,7 @@
           />
 
           <Pagination
+            v-if="!isArticleProcessing"
             :total="totalArticles"
             :current-page="currentPage"
             :page-size="defaultPageSize"
