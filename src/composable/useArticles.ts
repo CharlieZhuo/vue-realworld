@@ -1,6 +1,6 @@
 import { components } from "../api/schema";
 import { ApiClient } from "../api/apiClient";
-import { computed, ref, watch } from "vue";
+import { ref, watch } from "vue";
 
 export interface useArticlesProps {
   myFeed?: boolean;
@@ -10,26 +10,26 @@ export interface useArticlesProps {
 }
 
 import { useAsync } from "./useAsync";
-import { defaultPageSize } from "../api/apiClient";
+import { usePagination } from "./usePagination";
 
 export function useArticles(props: useArticlesProps) {
   const articles = ref<components["schemas"]["Article"][]>([]);
   const totalArticles = ref<number>(0);
-  const currentPage = ref(1);
+  
   const settingState = ref(props);
-
-  const offset = computed(() => (currentPage.value - 1) * defaultPageSize);
-
-  function changePage(to: number) {
-    currentPage.value = to;
+  function changeSetting(newSetting: useArticlesProps) {
+    settingState.value = newSetting;
   }
+
+  const { changePage, changePageSize, currentPage, offset, pageSize } =
+    usePagination();
 
   function fetchArticles() {
     if (settingState.value.myFeed) {
       return ApiClient.GET("/articles/feed", {
         params: {
           query: {
-            limit: defaultPageSize,
+            limit: pageSize.value,
             offset: offset.value,
           },
         },
@@ -37,13 +37,14 @@ export function useArticles(props: useArticlesProps) {
         if (data) {
           articles.value = data?.articles;
           totalArticles.value = data?.articlesCount;
+          return data;
         }
       });
     } else {
       return ApiClient.GET("/articles", {
         params: {
           query: {
-            limit: defaultPageSize,
+            limit: pageSize.value,
             offset: offset.value,
             tag: settingState.value.tagName,
             author: settingState.value.authorName,
@@ -54,15 +55,14 @@ export function useArticles(props: useArticlesProps) {
         if (data) {
           articles.value = data?.articles;
           totalArticles.value = data?.articlesCount;
+          return data;
         }
       });
     }
   }
   const { startProcess, isProcessing } = useAsync(fetchArticles);
 
-  function changeSetting(newSetting: useArticlesProps) {
-    settingState.value = newSetting;
-  }
+  
 
   //FeedMode改变时，重置页码并重新获取数据
   watch(
@@ -79,8 +79,9 @@ export function useArticles(props: useArticlesProps) {
     }
   );
 
+  //页码或每页数量改变时，重新获取数据
   watch(
-    [currentPage],
+    [currentPage, pageSize],
     () => {
       startProcess();
     },
@@ -93,6 +94,7 @@ export function useArticles(props: useArticlesProps) {
     isProcessing,
     currentPage,
     changePage,
+    changePageSize,
     changeSetting,
   };
 }
