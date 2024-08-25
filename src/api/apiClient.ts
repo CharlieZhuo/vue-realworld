@@ -7,11 +7,16 @@ if (!baseUrl) {
   throw new Error("VITE_API_BASE_URL is not set");
 }
 
-export let ApiClient: Client<paths> = createClient({ baseUrl });
+let ApiClient: Client<paths> = createClient({
+  baseUrl,
+  headers: undefined,
+});
+
+export {ApiClient};
 
 // 更新API客户端的令牌
 // 当用户登录或注销时，我们需要更新API客户端的令牌
-export function updateClientToken(authToken?: string) {
+export function reCreateClient(authToken?: string) {
   ApiClient = createClient({
     baseUrl,
     // add authorization header if authToken is provided
