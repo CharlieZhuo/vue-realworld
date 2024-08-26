@@ -24,7 +24,7 @@
 
           <Pagination
             v-if="!isArticlesLoading"
-            :total="totalArticles"
+            :total="totalCount"
             :current-page="currentPage"
             :page-size="defaultPageSize"
             @page-change="changePage"
@@ -59,7 +59,7 @@ import { watch } from "vue";
 
 const {
   articles,
-  totalArticles,
+  totalCount,
   isProcessing: isArticlesLoading,
   currentPage,
   changePage,
@@ -67,6 +67,7 @@ const {
 } = useArticles({
   myFeed: props.myFeed,
   tagName: props.tagName,
+  immediate: true,
 });
 
 watch(

@@ -37,7 +37,7 @@
 
           <Pagination
             v-if="!isArticleProcessing"
-            :total="totalArticles"
+            :total="totalCount"
             :current-page="currentPage"
             :page-size="defaultPageSize"
             @page-change="changePage"
@@ -64,14 +64,15 @@ const props = defineProps<{
 
 const {
   articles,
-  changePage,
   currentPage,
   isProcessing: isArticleProcessing,
-  totalArticles,
+  totalCount,
+  changePage,
   changeSetting,
 } = useArticles({
   authorName: props.favorites ? undefined : props.username,
   favoritedBy: props.favorites ? props.username : undefined,
+  immediate: true,
 });
 
 watch(

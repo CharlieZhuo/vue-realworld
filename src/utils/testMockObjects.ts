@@ -44,59 +44,50 @@ export class MockStore<T> implements Store<T> {
 
 type article = components["schemas"]["Article"];
 
-export const testArticlesSetA: article[] = [
-  {
-    slug: "test-article",
-    title: "Test Article",
+// 8 articles generated
+export const testArticlesSetA: article[] = Array.from(
+  { length: 8 },
+  (_, i) => ({
+    slug: `test-article-${i}`,
+    title: `Test Article ${i}`,
     description: "This is a test article",
     body: "This is a test article",
-    tagList: ["test"],
+    tagList: [`tag${i}`],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     favorited: false,
     favoritesCount: 0,
-    author: testProfileA,
-  },
-  {
-    slug: "test-article-2",
-    title: "Test Article 2",
-    description: "This is a test article",
-    body: "This is a test article",
-    tagList: ["test"],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    favorited: false,
-    favoritesCount: 0,
-    author: testProfileB,
-  },
-];
+    author: {
+      username: `test${i}`,
+      bio: "test bio",
+      image: "https://randomuser.me/api/portrait",
+      following: false,
+    },
+  })
+);
 
-export const testArticlesSetB: article[] = [
-  {
-    slug: "test-article-3",
-    title: "Test Article 3",
+// with 10 articles generated programmatically
+export const testArticlesSetB: article[] = Array.from(
+  { length: 10 },
+  (_, i) => ({
+    slug: `test-article-${i}`,
+    title: `Test Article ${i}`,
     description: "This is a test article",
     body: "This is a test article",
-    tagList: ["test"],
+    tagList: [`tag${i}`],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    favorited: false,
+    // randomly set favorited to true
+    favorited: Math.random() > 0.5,
     favoritesCount: 0,
-    author: testProfileA,
-  },
-  {
-    slug: "test-article-4",
-    title: "Test Article 4",
-    description: "This is a test article",
-    body: "This is a test article",
-    tagList: ["test"],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    favorited: false,
-    favoritesCount: 0,
-    author: testProfileB,
-  },
-];
+    author: {
+      username: `test${i}`,
+      bio: "test bio",
+      image: "https://randomuser.me/api/portrait",
+      following: false,
+    },
+  })
+);
 
 export const mockUserStore = new MockStore<User>();
 export const mockUserManager = new UserManager(mockUserStore);

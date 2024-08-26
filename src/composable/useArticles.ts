@@ -7,6 +7,7 @@ export interface useArticlesProps {
   tagName?: string;
   authorName?: string;
   favoritedBy?: string;
+  immediate?: boolean;
 }
 
 import { useAsync } from "./useAsync";
@@ -14,8 +15,8 @@ import { usePagination } from "./usePagination";
 
 export function useArticles(props: useArticlesProps) {
   const articles = ref<components["schemas"]["Article"][]>([]);
-  const totalArticles = ref<number>(0);
-  
+  const totalCount = ref<number>(0);
+
   const settingState = ref(props);
   function changeSetting(newSetting: useArticlesProps) {
     settingState.value = newSetting;
@@ -36,7 +37,7 @@ export function useArticles(props: useArticlesProps) {
       }).then(({ data }) => {
         if (data) {
           articles.value = data?.articles;
-          totalArticles.value = data?.articlesCount;
+          totalCount.value = data?.articlesCount;
           return data;
         }
       });
@@ -54,15 +55,13 @@ export function useArticles(props: useArticlesProps) {
       }).then(({ data }) => {
         if (data) {
           articles.value = data?.articles;
-          totalArticles.value = data?.articlesCount;
+          totalCount.value = data?.articlesCount;
           return data;
         }
       });
     }
   }
   const { startProcess, isProcessing } = useAsync(fetchArticles);
-
-  
 
   //FeedMode改变时，重置页码并重新获取数据
   watch(
@@ -85,16 +84,19 @@ export function useArticles(props: useArticlesProps) {
     () => {
       startProcess();
     },
-    { immediate: true }
+    {
+      immediate:props.immediate
+    }
   );
 
   return {
     articles,
-    totalArticles,
+    totalCount,
     isProcessing,
     currentPage,
     changePage,
     changePageSize,
     changeSetting,
+    startProcess,
   };
 }
