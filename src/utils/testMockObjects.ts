@@ -89,5 +89,19 @@ export const testArticlesSetB: article[] = Array.from(
   })
 );
 
+type comment = components["schemas"]["Comment"];
+export const mockComments: comment[] = Array.from({ length: 10 }, (_, i) => ({
+  id: i,
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+  body: "test comment",
+  author: {
+    username: "test",
+    bio: "test bio",
+    image: "https://randomuser.me/api/portrait",
+    following: false,
+  },
+}));
+
 export const mockUserStore = new MockStore<User>();
 export const mockUserManager = new UserManager(mockUserStore);
