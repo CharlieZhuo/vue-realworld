@@ -14,6 +14,7 @@ export function useTags() {
   const { startProcess, isProcessing } = useAsync(fetchTags);
   startProcess();
   return {
+    startProcess,
     tags,
     isProcessing,
   };
