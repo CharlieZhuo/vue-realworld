@@ -1,8 +1,6 @@
 import { describe, expect, it } from "vitest";
 import Login from "./Login.vue";
 import { flushPromises, mount } from "@vue/test-utils";
-import { http, HttpResponse } from "msw";
-import { setupServer } from "msw/node";
 import {
   testPassword,
   testUser,
@@ -10,6 +8,25 @@ import {
   mockUserStore,
 } from "../utils/testMockObjects";
 import { testRouter } from "../utils/testUtils";
+import { setupTestServer } from "../utils/testServer";
+import { HttpResponse } from "msw";
+import { components } from "../api/schema";
+
+type loginUserType = components["schemas"]["LoginUser"];
+
+setupTestServer({
+  method: "post",
+  url: "/users/login",
+  resolver: async ({ request }) => {
+    const user = (await request.clone().json()).user as loginUserType;
+    console.log(user);
+    if (user.email == testUser.email && user.password == testPassword) {
+      return HttpResponse.json({ user: testUser });
+    }
+    // 返回401响应:"Unauthorized"
+    return new HttpResponse(null, { status: 401, statusText: "Unauthorized" });
+  },
+});
 
 describe("Login.vue", () => {
   it("should render login form", () => {
@@ -25,31 +42,23 @@ describe("Login.vue", () => {
     expect(wrapper.find('a[href="/register"]').exists()).toBe(true);
   });
 
-  // it("should make api call when submit with correct form", async () => {
-  //   const wrapper = mount(Login, {
-  //     global: {
-  //       plugins: [testRouter, mockUserManager.UserPlugin],
-  //     },
-  //   });
-  //   const baseUrl = import.meta.env.VITE_API_BASE_URL as string | undefined;
-  //   const server = setupServer(
-  //     http.post(`${baseUrl}/users/login`, async ({ request }) => {
-  //       console.log(request.body);
-  //       return HttpResponse.json(testUser);
-  //     })
-  //   );
-  //   server.listen({ onUnhandledRequest: "error" });
+  it("should make api call when submit with correct form", async () => {
+    const wrapper = mount(Login, {
+      global: {
+        plugins: [testRouter, mockUserManager.UserPlugin],
+      },
+    });
 
-  //   await wrapper.find('input[type="email"]').setValue(testUser.email);
-  //   await wrapper.find('input[type="password"]').setValue(testPassword);
-  //   await wrapper.find("form").trigger("submit");
-  //   await flushPromises();
-  //   await flushPromises();
-  //   expect(wrapper.find(".error-messages li").text()).toBe("success");
-  //   expect(mockUserStore.get()).toBe(testUser);
+    await wrapper.get('input[type="email"]').setValue(testUser.email);
+    await wrapper.get('input[type="password"]').setValue(testPassword);
+    await wrapper.get("form").trigger("submit");
+    expect(wrapper.get("button").attributes("disabled")).toBe("");
+    await flushPromises();
 
-  //   server.close();
-  // });
+    expect(wrapper.findAll("li").some((li) => li.text() === "Login success")).toBe(true);
+    expect(testRouter.currentRoute.value.path).toBe("/");
+    expect(mockUserStore.get()).toEqual(testUser);
+  });
 
   // it("should display error message if api call respond with error", async () => {
   //   const wrapper = mount(Login, {

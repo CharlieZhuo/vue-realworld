@@ -12,14 +12,14 @@
             <li v-for="error in errorMessages" :key="error">{{ error }}</li>
           </ul>
 
-          <form ref="formRef" @submit="onSubmit">
+          <form ref="formRef" @submit.prevent="onSubmit">
             <fieldset class="form-group">
               <input
                 class="form-control form-control-lg"
                 required
                 type="email"
                 placeholder="Email"
-                v-model="formState.email"
+                v-model="loginFormState.email"
               />
             </fieldset>
             <fieldset class="form-group">
@@ -28,10 +28,14 @@
                 required
                 type="password"
                 placeholder="Password"
-                v-model="formState.password"
+                v-model="loginFormState.password"
               />
             </fieldset>
-            <button class="btn btn-lg btn-primary pull-xs-right" type="submit">
+            <button
+              :disabled="isProcessing"
+              class="btn btn-lg btn-primary pull-xs-right"
+              type="submit"
+            >
               Login
             </button>
           </form>
@@ -42,39 +46,27 @@
 </template>
 <script setup lang="ts">
 import { inject, ref } from "vue";
-import { components } from "../api/schema";
-type LoginType = components["schemas"]["LoginUser"];
-import { ApiClient } from "../api/apiClient";
 import { UserKey } from "../plugins/UserManager";
 import { useRouter } from "vue-router";
-import { AppRouteNames } from "../router";
+import { useLogIn } from "../composable/useLogIn";
 
 const router = useRouter();
 const userInject = inject(UserKey);
-const formState = ref<LoginType>({
-  email: "",
-  password: "",
-});
+
+const { isProcessing, loginFormState, startProcess: startLogin } = useLogIn();
 const formRef = ref<HTMLFormElement | null>(null);
 const errorMessages = ref<string[]>([]);
 
-function onSubmit(e: Event) {
-  e.preventDefault();
-  errorMessages.value.push("submitting");
-  ApiClient.POST("/users/login", { body: { user: formState.value } })
-    .then((rawResponse) => {
-      if (rawResponse.response.status !== 200 || !rawResponse.data) {
-        errorMessages.value.push(rawResponse.response.statusText);
-      } else {
-        console.log(rawResponse.data);
-        const user = rawResponse.data.user;
-        router.push({ name: "home" as AppRouteNames });
-        if (userInject) userInject.UpdateCurrentUser(user);
-      }
-    })
-    .catch((error) => {
-      errorMessages.value = error.message;
-      console.error(error);
-    });
+async function onSubmit() {
+  try {
+    const resultUser = await startLogin();
+    errorMessages.value.push("Login success");
+    if (userInject) {
+      userInject.UpdateCurrentUser(resultUser);
+    }
+    router.push({ name: "home" });
+  } catch (error) {
+    errorMessages.value.push(error as string);
+  }
 }
 </script>
