@@ -5,12 +5,10 @@ interface useAsyncOutput<T> {
   isProcessing: Ref<boolean>;
 }
 
-export function useAsync<T>(
-  prop: (...args: unknown[]) => T
-): useAsyncOutput<T> {
+export function useAsync<RT, AT>(prop: (...args: AT[]) => RT): useAsyncOutput<RT> {
   const isProcessingState = ref(false);
 
-  async function startProcess(...args: unknown[]): Promise<T> {
+  async function startProcess(...args: AT[]): Promise<RT> {
     isProcessingState.value = true;
     try {
       const result = await prop(...args);

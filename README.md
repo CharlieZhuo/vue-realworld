@@ -6,3 +6,11 @@
 感谢[vue3-realworld-example-app](https://github.com/mutoe/vue3-realworld-example-app)的贡献者，它为我提供了宝贵的参考。
 
 
+## 开发服务器
+`npm run dev`
+
+## 运行测试
+`npm run test`
+
+## 构建
+`npm run build`
