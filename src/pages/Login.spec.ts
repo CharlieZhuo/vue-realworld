@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import Login from "./Login.vue";
 import { flushPromises, mount } from "@vue/test-utils";
 import {
@@ -19,13 +19,16 @@ setupTestServer({
   url: "/users/login",
   resolver: async ({ request }) => {
     const user = (await request.clone().json()).user as loginUserType;
-    console.log(user);
     if (user.email == testUser.email && user.password == testPassword) {
       return HttpResponse.json({ user: testUser });
     }
     // 返回401响应:"Unauthorized"
-    return new HttpResponse(null, { status: 401, statusText: "Unauthorized" });
+    return HttpResponse.text(null, { status: 401, statusText: "Unauthorized" });
   },
+});
+
+beforeEach(() => {
+  mockUserStore.remove();
 });
 
 describe("Login.vue", () => {
@@ -55,23 +58,31 @@ describe("Login.vue", () => {
     expect(wrapper.get("button").attributes("disabled")).toBe("");
     await flushPromises();
 
-    expect(wrapper.findAll("li").some((li) => li.text() === "Login success")).toBe(true);
+    expect(
+      wrapper.findAll("li").some((li) => li.text() === "Login success")
+    ).toBe(true);
     expect(testRouter.currentRoute.value.path).toBe("/");
     expect(mockUserStore.get()).toEqual(testUser);
   });
 
-  // it("should display error message if api call respond with error", async () => {
-  //   const wrapper = mount(Login, {
-  //     global: {
-  //       plugins: [testRouter, mockUserManager.UserPlugin],
-  //     },
-  //   });
+  it("should display error message if api call respond with error", async () => {
+    const wrapper = mount(Login, {
+      global: {
+        plugins: [testRouter, mockUserManager.UserPlugin],
+      },
+    });
 
-  //   await wrapper.find('input[type="email"]').setValue('wrongemail@g.com');
-  //   await wrapper.find('input[type="password"]').setValue("wrongpassword");
-  //   await wrapper.find('button[type="submit"]').trigger("click");
-  //   await flushPromises();
-  //   expect(mockUserManager.CurrentUser).toBe(null);
-  //   expect(wrapper.find(".error-message li").text).toBe('Unauthorized');
-  // });
+    await wrapper.get('input[type="email"]').setValue(testUser.email);
+    await wrapper.get('input[type="password"]').setValue(testPassword + "1");
+    await wrapper.get("form").trigger("submit");
+    expect(wrapper.get("button").attributes("disabled")).toBe("");
+    
+    await flushPromises();
+
+    expect(
+      wrapper.findAll("li").some((li) => li.text() === "Unauthorized")
+    ).toBe(true);
+    expect(testRouter.currentRoute.value.path).toBe("/");
+    expect(mockUserStore.get()).toBeNull();
+  });
 });

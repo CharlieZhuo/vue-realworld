@@ -14,12 +14,11 @@ setupTestServer({
   url: "/users/login",
   resolver: async ({ request }) => {
     const user = (await request.clone().json()).user as loginUserType;
-    console.log(user);
     if (user.email == testUser.email && user.password == testPassword) {
       return HttpResponse.json({ user: testUser });
     }
     // 返回401响应:"Unauthorized"
-    return new HttpResponse(null, { status: 401, statusText: "Unauthorized" });
+    return HttpResponse.text(null, { status: 401, statusText: "Unauthorized" });
   },
 });
 

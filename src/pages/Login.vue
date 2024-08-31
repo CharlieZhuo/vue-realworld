@@ -66,7 +66,8 @@ async function onSubmit() {
     }
     router.push({ name: "home" });
   } catch (error) {
-    errorMessages.value.push(error as string);
+    console.error(error);
+    errorMessages.value.push((error as Error).message);
   }
 }
 </script>
