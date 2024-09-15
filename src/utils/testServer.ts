@@ -30,7 +30,8 @@ export function setupTestServer(...handlers: Array<serverHandlerProps>) {
     server.listen({ onUnhandledRequest: "error" });
     // recreate the client after the server is set up
     // otherwise server won't be able to intercept the request
-    reCreateClient(undefined);
+    // reCreateClient(undefined);
+    // it's not necessary anymore since we are using the proxy
   });
   afterEach(() => {
     server.resetHandlers();

@@ -7,13 +7,32 @@ if (!baseUrl) {
   throw new Error("VITE_API_BASE_URL is not set");
 }
 
-export let ApiClient: Client<paths> = createClient({
+let ApiClient: Client<paths> = createClient({
   baseUrl,
 });
+
+// re-create the client for test environment every time it's used
+if (process.env.NODE_ENV === "test") {
+  const clientProxy = new Proxy(
+    {},
+    {
+      get: (_, prop) => {
+        const client: any = reCreateClient(token);
+        return client[prop];
+      },
+    }
+  );
+
+  ApiClient = clientProxy as any;
+}
+export { ApiClient };
+
+let token: string | undefined = undefined;
 
 // 更新API客户端的令牌
 // 当用户登录或注销时，我们需要更新API客户端的令牌
 export function reCreateClient(authToken?: string) {
+  token = authToken;
   ApiClient = createClient({
     baseUrl,
     // add authorization header if authToken is provided
