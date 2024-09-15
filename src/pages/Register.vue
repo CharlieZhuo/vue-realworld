@@ -9,16 +9,16 @@
           </p>
 
           <ul class="error-messages">
-            <li>That email is already taken</li>
+            <li v-for="error in errorMessages" :key="error">{{ error }}</li>
           </ul>
 
-          <form ref="formRef" @submit.prevent="onSubmit">
+          <form @submit.prevent="onSubmit">
             <fieldset class="form-group">
               <input
                 class="form-control form-control-lg"
                 type="text"
                 placeholder="Your Name"
-                v-model="formState.username"
+                v-model="registerFormState.username"
                 required
               />
             </fieldset>
@@ -27,8 +27,8 @@
                 class="form-control form-control-lg"
                 type="email"
                 placeholder="Email"
-                v-model="formState.email"
-                readonly
+                v-model="registerFormState.email"
+                required
               />
             </fieldset>
             <fieldset class="form-group">
@@ -36,12 +36,16 @@
                 class="form-control form-control-lg"
                 type="password"
                 placeholder="Password"
-                v-model="formState.password"
+                v-model="registerFormState.password"
                 minlength="8"
                 required
               />
             </fieldset>
-            <button class="btn btn-lg btn-primary pull-xs-right" type="submit">
+            <button
+              :disabled="isProcessing"
+              class="btn btn-lg btn-primary pull-xs-right"
+              type="submit"
+            >
               Sign up
             </button>
           </form>
@@ -52,42 +56,29 @@
 </template>
 <script setup lang="ts">
 import { inject, ref } from "vue";
-import { components } from "../api/schema";
-type RegisterType = components["schemas"]["NewUser"];
 import { useRouter } from "vue-router";
 import { AppRouteNames } from "../router";
 import { UserKey } from "../plugins/UserManager";
-import { ApiClient } from "../api/apiClient";
+import { useRegister } from "../composable/useRegister";
 
 const router = useRouter();
 const userInject = inject(UserKey);
 
-const formState = ref<RegisterType>({
-  username: "",
-  email: "",
-  password: "",
-});
 const errorMessages = ref<string[]>([]);
 
-const formRef = ref<HTMLFormElement | null>(null);
+const { isProcessing, registerFormState, startProcess } = useRegister();
 
-function onSubmit() {
-  if (!formRef.value?.checkValidity()) {
-    errorMessages.value.push("Invalid form data");
-    return;
-  }
+async function onSubmit() {
   errorMessages.value = [];
-  ApiClient.POST("/users", { body: { user: formState.value } }).then(
-    (rawResponse) => {
-      if (!rawResponse.data) {
-        errorMessages.value.push(rawResponse.response.statusText);
-        return;
-      } else {
-        const user = rawResponse.data.user;
-        if (userInject) userInject.UpdateCurrentUser(user);
-        router.push({ name: "home" as AppRouteNames });
-      }
-    }
-  );
+
+  try {
+    const user = await startProcess();
+    errorMessages.value.push("Register success");
+    if (userInject) userInject.UpdateCurrentUser(user);
+    router.push({ name: "home" as AppRouteNames });
+  } catch (error) {
+    console.error(error);
+    errorMessages.value.push((error as Error).message);
+  }
 }
 </script>
