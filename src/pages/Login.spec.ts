@@ -80,7 +80,7 @@ describe("Login.vue", () => {
     await flushPromises();
 
     expect(
-      wrapper.findAll("li").some((li) => li.text() === "Unauthorized")
+      wrapper.findAll("li").some((li) => li.text() === "Unauthorized access")
     ).toBe(true);
     expect(testRouter.currentRoute.value.path).toBe("/");
     expect(mockUserStore.get()).toBeNull();

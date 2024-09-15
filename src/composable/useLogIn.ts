@@ -15,10 +15,12 @@ export function useLogIn() {
       body: {
         user: loginFormState.value,
       },
-    }).then(({ data,response }) => {
-      if(response.status!==200)
-        throw new Error(response.statusText);
-      else if (!data) throw new Error("Login request returned no data");
+    }).then(({ data, response }) => {
+      if (response.status == 401) {
+        throw new Error("Unauthorized access");
+      } else if (response.status == 422) {
+        throw new Error("Generic Error");
+      } else if (!data) throw new Error("Login request returned no data");
       return data.user;
     });
   }
